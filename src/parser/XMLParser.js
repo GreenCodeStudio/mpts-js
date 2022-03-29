@@ -24,7 +24,7 @@ export class XMLParser {
                 let result = this.parseElement();
                 element.children.push(result.element)
                 if (!result.autoclose)
-                    this.openElements.push(element);
+                    this.openElements.push(result.element);
             } else if (char == '{' && this.text[this.position + 1] == '{') {
                 this.position++;
             } else {

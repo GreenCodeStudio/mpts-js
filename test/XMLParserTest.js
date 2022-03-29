@@ -29,6 +29,17 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("div");
     });
+    it('elementsinside', async () => {
+        const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equals("div");
+        expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].children[0].tagName).to.be.equals("p");
+        expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].children[0].children[0].tagName).to.be.equals("strong");
+        expect(obj.children[0].children[0].children[1]).to.be.instanceOf(TElement);
+        expect(obj.children[0].children[0].children[1].tagName).to.be.equals("span");
+    });
     it('element with attributes', async () => {
         const obj = XMLParser.Parse("<img src=\"a.png\" alt=a/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
