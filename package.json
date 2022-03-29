@@ -1,0 +1,25 @@
+{
+  "name": "mpts",
+  "version": "0.1.0",
+  "description": "Multi Platform Template System",
+  "main": "src/index.js",
+  "repository": "https://github.com/GreenCodeStudio/mpts-js",
+  "author": "GreenCodeStudio",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha --require @babel/register"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/register": "^7.17.7",
+    "chai": "^4.3.6",
+    "fast-check": "^2.23.2",
+    "mocha": "^9.2.2",
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11",
+    "jsdom": "^19.0.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.8"
+  }
+}

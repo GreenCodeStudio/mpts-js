@@ -1,0 +1,58 @@
+const {expect} = require("chai");
+const {XMLParser} = require("../src/parser/XMLParser");
+const {TDocumentFragment} = require("../src/nodes/TDocumentFragment");
+const {TText} = require("../src/nodes/TText");
+const {TElement} = require("../src/nodes/TElement");
+
+describe('Parser', () => {
+    it('basic text', async () => {
+        const obj = XMLParser.Parse("Hello, world!");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].text).to.be.equals("Hello, world!");
+    });
+
+    it('encoded text', async () => {
+        const obj = XMLParser.Parse("&#65;&#x0042;");
+        expect(obj.children[0].text).to.be.equals("AB");
+    });
+
+    it('basic element', async () => {
+        const obj = XMLParser.Parse("<br/>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equals("br");
+    });
+    it('basic element2', async () => {
+        const obj = XMLParser.Parse("<div></div>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equals("div");
+    });
+    it('element with attributes', async () => {
+        const obj = XMLParser.Parse("<img src=\"a.png\" alt=a/>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equals("img");
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[0].name).to.be.equals("src");
+        expect(obj.children[0].attributes[0].name).to.be.equals("a.png");
+        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[1].name).to.be.equals("alt");
+        expect(obj.children[0].attributes[1].name).to.be.equals("a");
+    });
+
+    it('comment', async () => {
+        const obj = XMLParser.Parse("<!--comment-->");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TComment);
+        expect(obj.children[0].text).to.be.equals("comment");
+    });
+
+    it('comment', async () => {
+        const obj = XMLParser.Parse("<!--comment-->");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TComment);
+        expect(obj.children[0].text).to.be.equals("comment");
+    });
+})
