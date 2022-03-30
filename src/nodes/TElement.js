@@ -1,11 +1,11 @@
 import {getUniqName} from "../utils";
 
 export class TElement {
-    name = "";
+    tagName = "";
     children = [];
 
     execute(env) {
-        let ret = env.document.createElement(this.name);
+        let ret = env.document.createElement(this.tagName);
         for (const child of this.children) {
             ret.appendChild(child.execute(env))
         }
@@ -14,7 +14,7 @@ export class TElement {
 
     compileJS() {
         let rootName = getUniqName();
-        let code = 'const ' + rootName + '=document.createElement('+JSON.stringify(this.name)+');';
+        let code = 'const ' + rootName + '=document.createElement('+JSON.stringify(this.tagName)+');';
         for (const child of this.children) {
             let childResult = child.compileJS();
             code += childResult.code;

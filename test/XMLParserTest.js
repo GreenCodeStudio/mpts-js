@@ -12,11 +12,6 @@ describe('Parser', () => {
         expect(obj.children[0].text).to.be.equals("Hello, world!");
     });
 
-    it('encoded text', async () => {
-        const obj = XMLParser.Parse("&#65;&#x0042;");
-        expect(obj.children[0].text).to.be.equals("AB");
-    });
-
     it('basic element', async () => {
         const obj = XMLParser.Parse("<br/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);

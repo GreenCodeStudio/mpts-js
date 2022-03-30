@@ -20,6 +20,7 @@
     "jsdom": "^19.0.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.8"
+    "@babel/runtime": "^7.17.8",
+    "he": "^1.2.0"
   }
 }

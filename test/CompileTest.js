@@ -7,7 +7,7 @@ const {document} = (new JSDOM(`...`)).window;
 
 function fragmentToHtml(fragment) {
     const div = document.createElement('div');
-    for (const childNode of fragment.childNodes) {
+    for (const childNode of Array.from(fragment.childNodes)) {
         div.append(childNode);
     }
     return div.innerHTML;
@@ -20,5 +20,13 @@ describe('Compile', () => {
         const document = (new JSDOM(`...`)).window.document;
         const result = eval(compiled.code+compiled.rootName);
         expect(fragmentToHtml(result)).to.be.equal("Hello, world!");
+    });
+    it('variable', async () => {
+        const obj = XMLParser.Parse("{{a}}{{b}}");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables={a:0,b:"b"}
+        const result = eval(compiled.code+compiled.rootName);
+        expect(fragmentToHtml(result)).to.be.equal("0b");
     });
 })
