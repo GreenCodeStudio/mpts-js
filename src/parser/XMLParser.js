@@ -4,6 +4,9 @@ import {TElement} from "../nodes/TElement";
 import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 import {TEVariable} from "../nodes/expressions/TEVariable";
 import {TExpressionText} from "../nodes/TExpressionText";
+import {TAttribute} from "../nodes/TAttribute";
+import {ExpressionParser} from "./ExpressionParser";
+import {TExpressionAttribute} from "../nodes/TExpressionAttribute";
 
 export class XMLParser {
     constructor(text) {
@@ -23,7 +26,7 @@ export class XMLParser {
             let last = element.children[element.children.length - 1];
             if (char == '<') {
                 if (this.text[this.position + 1] == '/') {
-                    this.position+=2;
+                    this.position += 2;
                     let name = this.parseElementEnd();
                     if (element instanceof TElement && element.tagName == name) {
                         this.openElements.pop();
@@ -73,13 +76,55 @@ export class XMLParser {
             if (char == '>') {
                 this.position++;
                 break;
-            }
-            if (char == '/') {
+            } else if (char == '/') {
+                this.position++;
                 autoclose = true;
+            } else if (/\s/.test(char)) {
+                this.position++;
+            } else {
+                let type = 'static'
+                if (char == ':') {
+                    this.position++;
+                    type = 'expression'
+                }
+                let name = this.readUntill(/[\s=]/);
+                let value = null;
+                this.skipWhitespace()
+                if (this.text[this.position] == '=') {
+                    this.position++
+                    this.skipWhitespace()
+
+                    if (this.text[this.position] == '"') {
+                        this.position++
+                        value = this.readUntill(/"/);
+                        this.position++
+                    } else if (this.text[this.position] == "'") {
+                        this.position++
+                        value = this.readUntill(/'/);
+                        this.position++
+                    } else {
+                        value = this.readUntill(/[\s/]/);
+                    }
+                }
+                if (type == 'static')
+                    element.attributes.push(new TAttribute(name, value))
+                else
+                    element.attributes.push(new TExpressionAttribute(name, ExpressionParser.Parse(value)))
             }
-            this.position++;
         }
         return {element, autoclose};
+    }
+
+    readUntill(regexp) {
+        let ret = '';
+        while (this.position < this.text.length) {
+            const char = this.text[this.position];
+            if (regexp.test(char))
+                break;
+            ret += char;
+            this.position++;
+        }
+        return ret;
     }
 
     parseElementEnd() {
@@ -104,17 +149,19 @@ export class XMLParser {
     }
 
     parseExpression(end) {
-        let name = "";
+        let text = "";
         while (this.position < this.text.length) {
             if (this.text.slice(this.position, this.position + end.length) == end) {
                 this.position += end.length;
                 break;
             }
-            name += this.text[this.position];
+            text += this.text[this.position];
             this.position++;
         }
-        let variable = new TEVariable();
-        variable.name = name;
-        return variable;
+        return ExpressionParser.Parse(text);
+    }
+
+    skipWhitespace() {
+        this.readUntill(/\S/)
     }
 }

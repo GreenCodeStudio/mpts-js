@@ -45,4 +45,32 @@ describe('ExecutionText', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
     });
+    it('basic html', async () => {
+        const obj = XMLParser.Parse("<div>&#65;&#x0042;{{c}}</div>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.c = "C";
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
+    });
+    it('if else', async () => {
+        const obj = XMLParser.Parse('<:if :condition="v==1">a</:if><:else-if :condition="v==2">b</:else-if><:else>c</:else>');
+        const env = new Environment();
+        env.document = document;
+        env.variables.v = 1;
+        const result1 = obj.execute(env);
+        expect(fragmentToHtml(result1)).to.be.equal("a");
+
+        env.variables.v = 2;
+        const result2 = obj.execute(env);
+        expect(fragmentToHtml(result2)).to.be.equal("b");
+
+        env.variables.v = 3;
+        const result3 = obj.execute(env);
+        expect(fragmentToHtml(result3)).to.be.equal("c");
+
+    });
+
+    it('loop', async () => {
+    })
 })
