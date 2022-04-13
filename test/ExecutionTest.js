@@ -13,8 +13,8 @@ function fragmentToHtml(fragment) {
     return div.innerHTML;
 }
 
-describe('ExecutionText', () => {
-    it('hello world', async () => {
+describe('Execution', () => {
+    it('basic text', async () => {
         const obj = XMLParser.Parse("Hello, world!");
         const env = new Environment();
         env.document = document;
@@ -37,13 +37,20 @@ describe('ExecutionText', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("<div></div>");
     });
-    it('basic html', async () => {
-        const obj = XMLParser.Parse("<div>&#65;&#x0042;{{c}}</div>");
+    it('basic element', async () => {
+        const obj = XMLParser.Parse("<br/>");
         const env = new Environment();
         env.document = document;
-        env.variables.c = "C";
         const result = obj.execute(env);
-        expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
+        expect(fragmentToHtml(result)).to.be.equal("<br/>");
+    });
+
+    it('elementsinside', async () => {
+        const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal("<div><p><strong></strong><span></span></p></div>");
     });
     it('basic html', async () => {
         const obj = XMLParser.Parse("<div>&#65;&#x0042;{{c}}</div>");
@@ -52,9 +59,18 @@ describe('ExecutionText', () => {
         env.variables.c = "C";
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
+    });
+    it('element with attributes', async () => {
+        const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e)></div>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.d = 4;
+        env.variables.e = 5;
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal("<div a=\"1\" b=\"2\" c=\"3\" d=\"4\" e=\"5\"></div>");
     });
     it('if else', async () => {
-        const obj = XMLParser.Parse('<:if :condition="v==1">a</:if><:else-if :condition="v==2">b</:else-if><:else>c</:else>');
+        const obj = XMLParser.Parse('<:if condition=(v==1)>a</:if><:else-if condition=(v==2)>b</:else-if><:else>c</:else>');
         const env = new Environment();
         env.document = document;
         env.variables.v = 1;

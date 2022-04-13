@@ -36,7 +36,11 @@ export class XMLParser {
                 } else {
                     this.position++;
                     let result = this.parseElement();
-                    element.children.push(result.element)
+                    if(result.element.tagName.startsWith(':')){
+
+                    }else{
+                        element.children.push(result.element)
+                    }
                     if (!result.autoclose)
                         this.openElements.push(result.element);
                 }
@@ -62,6 +66,7 @@ export class XMLParser {
     parseElement() {
         let autoclose = false;
         let element = new TElement();
+        element.parsePosition=this.position;
         element.tagName = "";
         while (this.position < this.text.length) {
             const char = this.text[this.position];

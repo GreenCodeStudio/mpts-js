@@ -39,7 +39,7 @@ describe('Parser', () => {
         expect(obj.children[0].children[0].children[1].tagName).to.be.equals("span");
     });
     it('element with attributes', async () => {
-        const obj = XMLParser.Parse("<img src=\"a.png\" alt=a/>");
+        const obj = XMLParser.Parse("<img src=\"a.png\" alt='a'/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("img");
@@ -52,7 +52,7 @@ describe('Parser', () => {
     });
 
     it('element with attributes with variables', async () => {
-        const obj = XMLParser.Parse("<img :src=\"v1\" :alt=v2/>");
+        const obj = XMLParser.Parse("<img src=(v1) alt=v2/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("img");
@@ -74,10 +74,12 @@ describe('Parser', () => {
     });
 
     it('if', async () => {
-        const obj = XMLParser.Parse("<:if :condition=\"false\">text</:if>");
+        const obj = XMLParser.Parse("<:if condition=false>text</:if><:else>text</:else>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TIf);
-        expect(obj.children[0].expression).to.be.instanceOf(TEBool);
-        expect(obj.children[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBool);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBool);
+        expect(obj.children[0].elseChildren[0]).to.be.instanceOf(TText);
     });
 })
