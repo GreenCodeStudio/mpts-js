@@ -19,6 +19,9 @@ export class TElement {
     compileJS() {
         let rootName = getUniqName();
         let code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
+        for (const attr of this.attributes) {
+            code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS().code + ");";
+        }
         for (const child of this.children) {
             let childResult = child.compileJS();
             code += childResult.code;

@@ -17,7 +17,7 @@ export class ExpressionParser extends AbstractParser{
         return (new ExpressionParser(text)).parseNormal();
     }
 
-    parseNormal() {
+    parseNormal(endLevel=0) {
         let lastNode = null;
         while (this.position < this.text.length) {
             const char = this.text[this.position];
@@ -36,9 +36,22 @@ export class ExpressionParser extends AbstractParser{
                 let value = this.readUntill(/'/);
                 this.position++;
                 lastNode = new TEString(value);
+            }
+            else if (char == "(") {
+                this.position++;
+                let value = this.parseNormal(1);
+                this.position++;
+                lastNode = value;
+            }
+            else if (char == ")") {
+                if(endLevel>=1){
+                    break;
+                }else{
+                    throw new Error("( not opened");
+                }
             }else if (char == "=" && this.text[this.position+1]=="=") {
                 this.position+=2;
-                let right=this.parseNormal();
+                let right=this.parseNormal(2);
                 lastNode=new TEEqual(lastNode, right);
             } else {
                 let name = this.readUntill(/['"\(\)=\s]/);
