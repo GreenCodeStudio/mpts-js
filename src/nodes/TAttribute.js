@@ -1,6 +1,6 @@
 export class TAttribute {
-    constructor(name, value) {
+    constructor(name, expression) {
         this.name = name;
-        this.value = value;
+        this.expression = expression;
     }
 }

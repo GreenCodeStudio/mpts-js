@@ -1,5 +1,8 @@
 import {TDocumentFragment} from "../nodes/TDocumentFragment";
 import {TEVariable} from "../nodes/expressions/TEVariable";
+import {TEBoolean} from "../nodes/expressions/TEBoolean";
+import {TENumber} from "../nodes/expressions/TENumber";
+import {TEString} from "../nodes/expressions/TEString";
 
 export class ExpressionParser {
     constructor(text) {
@@ -17,9 +20,27 @@ export class ExpressionParser {
             const char = this.text[this.position];
             if (/\s/.test(char)) {
                 this.position++;
-            }else{
-                let name=this.readUntill(/\s/);
-                lastNode=new TEVariable(name);
+            } else if (/[0-9\.\-+]/.test(char)) {
+                let value = this.readUntill(/\s/);
+                lastNode = new TENumber(+value);
+            } else if (char == '"') {
+                this.position++;
+                let value = this.readUntill(/"/);
+                this.position++;
+                lastNode = new TEString(value);
+            } else if (char == "'") {
+                this.position++;
+                let value = this.readUntill(/'/);
+                this.position++;
+                lastNode = new TEString(value);
+            } else {
+                let name = this.readUntill(/\s/);
+                if (name == 'true')
+                    lastNode = new TEBoolean(true)
+                else if (name == 'false')
+                    lastNode = new TEBoolean(false)
+                else
+                    lastNode = new TEVariable(name);
             }
         }
         return lastNode;

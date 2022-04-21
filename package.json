@@ -7,7 +7,7 @@
   "author": "GreenCodeStudio",
   "license": "MIT",
   "scripts": {
-    "test": "mocha --require @babel/register"
+    "test": "mocha test test/Expression --require @babel/register"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.17.0",

@@ -5,8 +5,9 @@ import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 import {TEVariable} from "../nodes/expressions/TEVariable";
 import {TExpressionText} from "../nodes/TExpressionText";
 import {TAttribute} from "../nodes/TAttribute";
+import {TIf} from "../nodes/TIf";
 import {ExpressionParser} from "./ExpressionParser";
-import {TExpressionAttribute} from "../nodes/TExpressionAttribute";
+import {TEString} from "../nodes/expressions/TEString";
 
 export class XMLParser {
     constructor(text) {
@@ -28,7 +29,10 @@ export class XMLParser {
                 if (this.text[this.position + 1] == '/') {
                     this.position += 2;
                     let name = this.parseElementEnd();
-                    if (element instanceof TElement && element.tagName == name) {
+
+                    if (name.startsWith(':')) {
+                        this.closeSpecialElement(name, this.openElements);
+                    } else if (element instanceof TElement && element.tagName == name) {
                         this.openElements.pop();
                     } else {
                         throw new Error(`Element <${name}> not opened as last`);
@@ -36,13 +40,14 @@ export class XMLParser {
                 } else {
                     this.position++;
                     let result = this.parseElement();
-                    if(result.element.tagName.startsWith(':')){
+                    if (result.element.tagName.startsWith(':')) {
+                        this.convertToSpecialElement(result, element);
 
-                    }else{
+                    } else {
                         element.children.push(result.element)
+                        if (!result.autoclose)
+                            this.openElements.push(result.element);
                     }
-                    if (!result.autoclose)
-                        this.openElements.push(result.element);
                 }
             } else if (char == '{' && this.text[this.position + 1] == '{') {
                 this.position += 2;
@@ -66,7 +71,7 @@ export class XMLParser {
     parseElement() {
         let autoclose = false;
         let element = new TElement();
-        element.parsePosition=this.position;
+        element.parsePosition = this.position;
         element.tagName = "";
         while (this.position < this.text.length) {
             const char = this.text[this.position];
@@ -87,11 +92,6 @@ export class XMLParser {
             } else if (/\s/.test(char)) {
                 this.position++;
             } else {
-                let type = 'static'
-                if (char == ':') {
-                    this.position++;
-                    type = 'expression'
-                }
                 let name = this.readUntill(/[\s=]/);
                 let value = null;
                 this.skipWhitespace()
@@ -101,20 +101,21 @@ export class XMLParser {
 
                     if (this.text[this.position] == '"') {
                         this.position++
-                        value = this.readUntill(/"/);
+                        value = new TEString(this.readUntill(/"/));
                         this.position++
                     } else if (this.text[this.position] == "'") {
                         this.position++
-                        value = this.readUntill(/'/);
+                        value = new TEString(this.readUntill(/'/));
+                        this.position++
+                    } else if (this.text[this.position] == "(") {
+                        this.position++
+                        value = ExpressionParser.Parse(this.readUntill(/\)/));
                         this.position++
                     } else {
-                        value = this.readUntill(/[\s/]/);
+                        value = ExpressionParser.Parse(this.readUntill(/[\s>/]/));
                     }
                 }
-                if (type == 'static')
-                    element.attributes.push(new TAttribute(name, value))
-                else
-                    element.attributes.push(new TExpressionAttribute(name, ExpressionParser.Parse(value)))
+                element.attributes.push(new TAttribute(name, value))
             }
         }
         return {element, autoclose};
@@ -168,5 +169,59 @@ export class XMLParser {
 
     skipWhitespace() {
         this.readUntill(/\S/)
+    }
+
+    convertToSpecialElement(result, element) {
+        if (result.element.tagName.toLowerCase() == ':if') {
+            let node = new TIf();
+            const expression = result.element.attributes.find(x => x.name == 'condition').expression;
+            node.conditions.push({expression, children: []});
+            element.children.push(node);
+
+            if (!result.autoclose)
+                this.openElements.push(node);
+        } else if (result.element.tagName.toLowerCase() == ':else-if') {
+            const last = element.children[element.children.length - 1];
+            if (!(last instanceof TIf && last.else == null))
+                throw new Error("need if before else-if")
+
+            const expression = result.element.attributes.find(x => x.name == 'condition').expression;
+            last.conditions.push({expression, children: []});
+
+            if (!result.autoclose)
+                this.openElements.push(last);
+        } else if (result.element.tagName.toLowerCase() == ':else') {
+            const last = element.children[element.children.length - 1];
+            if (!(last instanceof TIf && last.else == null))
+                throw new Error("need if before else")
+
+            last.else = {children: []};
+            if (!result.autoclose)
+                this.openElements.push(last);
+        }
+    }
+
+    closeSpecialElement(tagName, openElements) {
+        const last = openElements[openElements.length - 1]
+        if (tagName.toLowerCase() == ':if') {
+            if (last instanceof TIf && last.conditions.length == 1 && last.else == null) {
+                openElements.pop()
+            } else {
+                throw new Error("Last opened element is not <:if>");
+            }
+        } else if (tagName.toLowerCase() == ':else-if') {
+            if (last instanceof TIf && last.conditions.length > 1 && last.else == null) {
+                openElements.pop()
+            } else {
+                throw new Error("Last opened element is not <:else-if>");
+            }
+
+        } else if (tagName.toLowerCase() == ':else') {
+            if (last instanceof TIf && last.else != null) {
+                openElements.pop()
+            } else {
+                throw new Error("Last opened element is not <:else>");
+            }
+        }
     }
 }

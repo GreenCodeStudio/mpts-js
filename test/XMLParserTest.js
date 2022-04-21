@@ -4,8 +4,10 @@ const {TDocumentFragment} = require("../src/nodes/TDocumentFragment");
 const {TText} = require("../src/nodes/TText");
 const {TElement} = require("../src/nodes/TElement");
 const {TAttribute} = require("../src/nodes/TAttribute");
-const {TExpressionAttribute} = require("../src/nodes/TExpressionAttribute");
+const {TIf} = require("../src/nodes/TIf");
 const {TEVariable} = require("../src/nodes/expressions/TEVariable");
+const {TEString} = require("../src/nodes/expressions/TEString");
+const {TEBoolean} = require("../src/nodes/expressions/TEBoolean");
 
 describe('Parser', () => {
     it('basic text', async () => {
@@ -45,10 +47,12 @@ describe('Parser', () => {
         expect(obj.children[0].tagName).to.be.equals("img");
         expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
         expect(obj.children[0].attributes[0].name).to.be.equals("src");
-        expect(obj.children[0].attributes[0].value).to.be.equals("a.png");
+        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
+        expect(obj.children[0].attributes[0].expression.value).to.be.equal("a.png");
         expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
         expect(obj.children[0].attributes[1].name).to.be.equals("alt");
-        expect(obj.children[0].attributes[1].value).to.be.equals("a");
+        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
+        expect(obj.children[0].attributes[1].expression.value).to.be.equal("a");
     });
 
     it('element with attributes with variables', async () => {
@@ -56,11 +60,11 @@ describe('Parser', () => {
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("img");
-        expect(obj.children[0].attributes[0]).to.be.instanceOf(TExpressionAttribute);
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
         expect(obj.children[0].attributes[0].name).to.be.equals("src");
         expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEVariable);
         expect(obj.children[0].attributes[0].expression.name).to.be.equal("v1");
-        expect(obj.children[0].attributes[1]).to.be.instanceOf(TExpressionAttribute);
+        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
         expect(obj.children[0].attributes[1].name).to.be.equals("alt");
         expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEVariable);
         expect(obj.children[0].attributes[1].expression.name).to.be.equal("v2");
@@ -77,9 +81,9 @@ describe('Parser', () => {
         const obj = XMLParser.Parse("<:if condition=false>text</:if><:else>text</:else>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TIf);
-        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBool);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
         expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBool);
-        expect(obj.children[0].elseChildren[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
+        expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
     });
 })

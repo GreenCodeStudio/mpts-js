@@ -42,7 +42,7 @@ describe('Execution', () => {
         const env = new Environment();
         env.document = document;
         const result = obj.execute(env);
-        expect(fragmentToHtml(result)).to.be.equal("<br/>");
+        expect(fragmentToHtml(result)).to.be.equal("<br>");
     });
 
     it('elementsinside', async () => {

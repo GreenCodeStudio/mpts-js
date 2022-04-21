@@ -7,6 +7,9 @@ export class TElement {
 
     execute(env) {
         let ret = env.document.createElement(this.tagName);
+        for (const attr of this.attributes) {
+            ret.setAttribute(attr.name, attr.expression.execute(env));
+        }
         for (const child of this.children) {
             ret.appendChild(child.execute(env))
         }
