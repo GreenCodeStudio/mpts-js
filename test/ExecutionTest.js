@@ -89,6 +89,26 @@ describe('Execution', () => {
     });
 
     it('loop', async () => {
-        //todo
+        const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("bbbbbbbbbb");
+    })
+    it('foreach basic', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = [1,2,3,4,5];
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("bbbbb");
+    })
+    it('foreach advanced', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</:foreach>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = ['a','b','c','d','e'];
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
     })
 })

@@ -86,4 +86,31 @@ describe('Parser', () => {
         expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
         expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
     });
+    it('loop', async () => {
+        const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TLoop);
+        expect(obj.children[0].count).to.be.equal(10);
+        expect(obj.children[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].children[0].value).to.be.equal('b');
+    })
+    it('foreach basic', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TForeach);
+        expect(obj.children[0].collection).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].collection.name).to.be.equal('a');
+        expect(obj.children[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].children[0].value).to.be.equal('b');
+    });
+    it('foreach advanced', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</:foreach>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TForeach);
+        expect(obj.children[0].collection).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].collection.name).to.be.equal('a');
+        expect(obj.children[0].item).to.be.equal('b');
+        expect(obj.children[0].key).to.be.equal('c');
+        expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+    });
 })
