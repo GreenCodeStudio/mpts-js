@@ -3,9 +3,12 @@ import {TEVariable} from "../nodes/expressions/TEVariable";
 import {TEBoolean} from "../nodes/expressions/TEBoolean";
 import {TENumber} from "../nodes/expressions/TENumber";
 import {TEString} from "../nodes/expressions/TEString";
+import {TEEqual} from "../nodes/expressions/TEEqual";
+import {AbstractParser} from "./AbstractParser";
 
-export class ExpressionParser {
+export class ExpressionParser extends AbstractParser{
     constructor(text) {
+        super();
         this.text = text;
         this.position = 0;
     }
@@ -33,8 +36,12 @@ export class ExpressionParser {
                 let value = this.readUntill(/'/);
                 this.position++;
                 lastNode = new TEString(value);
+            }else if (char == "=" && this.text[this.position+1]=="=") {
+                this.position+=2;
+                let right=this.parseNormal();
+                lastNode=new TEEqual(lastNode, right);
             } else {
-                let name = this.readUntill(/\s/);
+                let name = this.readUntill(/['"\(\)=\s]/);
                 if (name == 'true')
                     lastNode = new TEBoolean(true)
                 else if (name == 'false')
@@ -46,19 +53,4 @@ export class ExpressionParser {
         return lastNode;
     }
 
-    readUntill(regexp) {
-        let ret = '';
-        while (this.position < this.text.length) {
-            const char = this.text[this.position];
-            if (regexp.test(char))
-                break;
-            ret += char;
-            this.position++;
-        }
-        return ret;
-    }
-
-    skipWhitespace() {
-        this.readUntill(/\S/)
-    }
 }

@@ -23,7 +23,7 @@ describe('Execution', () => {
     });
 
     it('encoded text', async () => {
-        const obj = XMLParser.Parse("&lt;&#65;&#x0042;&copy;&amp;&gt");
+        const obj = XMLParser.Parse("&lt;&#65;&#x0042;&copy;&amp;&gt;");
         const env = new Environment();
         env.document = document;
         const result = obj.execute(env);
@@ -45,7 +45,7 @@ describe('Execution', () => {
         expect(fragmentToHtml(result)).to.be.equal("<br>");
     });
 
-    it('elementsinside', async () => {
+    it('elements inside', async () => {
         const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");
         const env = new Environment();
         env.document = document;
@@ -73,6 +73,7 @@ describe('Execution', () => {
         const obj = XMLParser.Parse('<:if condition=(v==1)>a</:if><:else-if condition=(v==2)>b</:else-if><:else>c</:else>');
         const env = new Environment();
         env.document = document;
+
         env.variables.v = 1;
         const result1 = obj.execute(env);
         expect(fragmentToHtml(result1)).to.be.equal("a");
@@ -88,5 +89,6 @@ describe('Execution', () => {
     });
 
     it('loop', async () => {
+        //todo
     })
 })

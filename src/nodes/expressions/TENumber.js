@@ -1,7 +1,7 @@
 import {getUniqName} from "../../utils";
 
 export class TENumber {
-    value = "";
+    value = NaN;
 
     constructor(value = 0) {
         this.value = +value;

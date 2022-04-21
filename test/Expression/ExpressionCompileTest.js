@@ -40,5 +40,14 @@ describe('ExpressionTest', () => {
             const obj = ExpressionParser.Parse('"text"');
             expect(obj.compileJS().code).to.be.equal('"text"')
         });
+
+        it('equal', async () => {
+            const obj = ExpressionParser.Parse('a==b');
+            expect(obj.compileJS().code).to.be.equal('variables[\"a\"]==variables[\"b\"]')
+        });
+        it('equal double', async () => {
+            const obj = ExpressionParser.Parse('(a==b)==(c==d)');
+            expect(obj.compileJS().code).to.be.equal('(variables[\"a\"]==variables[\"b\"])==(variables[\"c\"]==variables[\"d\"])')
+        });
     });
 });

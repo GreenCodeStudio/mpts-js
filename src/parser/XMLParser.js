@@ -8,9 +8,11 @@ import {TAttribute} from "../nodes/TAttribute";
 import {TIf} from "../nodes/TIf";
 import {ExpressionParser} from "./ExpressionParser";
 import {TEString} from "../nodes/expressions/TEString";
+import {AbstractParser} from "./AbstractParser";
 
-export class XMLParser {
+export class XMLParser extends AbstractParser {
     constructor(text) {
+        super();
         this.text = text;
         this.position = 0;
         this.openElements = [new TDocumentFragment()];
@@ -72,7 +74,6 @@ export class XMLParser {
         let autoclose = false;
         let element = new TElement();
         element.parsePosition = this.position;
-        element.tagName = "";
         while (this.position < this.text.length) {
             const char = this.text[this.position];
             if (char == '>' || char == ' ' || char == '/')
@@ -82,7 +83,7 @@ export class XMLParser {
         }
 
         while (this.position < this.text.length) {
-            const char = this.text[this.position];
+            let char = this.text[this.position];
             if (char == '>') {
                 this.position++;
                 break;
@@ -95,19 +96,21 @@ export class XMLParser {
                 let name = this.readUntill(/[\s=]/);
                 let value = null;
                 this.skipWhitespace()
-                if (this.text[this.position] == '=') {
+                char = this.text[this.position];
+                if (char == '=') {
                     this.position++
                     this.skipWhitespace()
 
-                    if (this.text[this.position] == '"') {
+                    const char2 = this.text[this.position];
+                    if (char2 == '"') {
                         this.position++
                         value = new TEString(this.readUntill(/"/));
                         this.position++
-                    } else if (this.text[this.position] == "'") {
+                    } else if (char2 == "'") {
                         this.position++
                         value = new TEString(this.readUntill(/'/));
                         this.position++
-                    } else if (this.text[this.position] == "(") {
+                    } else if (char2 == "(") {
                         this.position++
                         value = ExpressionParser.Parse(this.readUntill(/\)/));
                         this.position++
@@ -119,18 +122,6 @@ export class XMLParser {
             }
         }
         return {element, autoclose};
-    }
-
-    readUntill(regexp) {
-        let ret = '';
-        while (this.position < this.text.length) {
-            const char = this.text[this.position];
-            if (regexp.test(char))
-                break;
-            ret += char;
-            this.position++;
-        }
-        return ret;
     }
 
     parseElementEnd() {
@@ -157,7 +148,7 @@ export class XMLParser {
     parseExpression(end) {
         let text = "";
         while (this.position < this.text.length) {
-            if (this.text.slice(this.position, this.position + end.length) == end) {
+            if (this.text.substring(this.position, this.position + end.length) == end) {
                 this.position += end.length;
                 break;
             }
@@ -165,10 +156,6 @@ export class XMLParser {
             this.position++;
         }
         return ExpressionParser.Parse(text);
-    }
-
-    skipWhitespace() {
-        this.readUntill(/\S/)
     }
 
     convertToSpecialElement(result, element) {

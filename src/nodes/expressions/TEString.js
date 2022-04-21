@@ -13,7 +13,7 @@ export class TEString {
 
     compileJS() {
         let code = JSON.stringify("" + this.value);
-        ;
+
         return {code};
     }
 }

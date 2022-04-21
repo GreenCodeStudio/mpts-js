@@ -1,6 +1,8 @@
 import {expect} from "chai";
 import {TEString} from "../../src/nodes/expressions/TEString";
 import {TENumber} from "../../src/nodes/expressions/TENumber";
+import {TEEqual} from "../../src/nodes/expressions/TEEqual";
+
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
 const {TEBoolean} = require("../../src/nodes/expressions/TEBoolean");
@@ -46,6 +48,24 @@ describe('ExpressionTest', () => {
             const obj = ExpressionParser.Parse('"text"');
             expect(obj).to.be.instanceOf(TEString)
             expect(obj.value).to.be.equal("text")
+        });
+        it('equal', async () => {
+            const obj = ExpressionParser.Parse('a==b');
+            expect(obj).to.be.instanceOf(TEEqual)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("a")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("b")
+        });
+        it('equal double', async () => {
+            const obj = ExpressionParser.Parse('(a==b)==(c==d)');
+            expect(obj).to.be.instanceOf(TEEqual)
+            expect(obj.left).to.be.instanceOf(TEEqual)
+            expect(obj.left.left.name).to.be.equal("a")
+            expect(obj.left.right.name).to.be.equal("b")
+            expect(obj.right).to.be.instanceOf(TEEqual)
+            expect(obj.right.left.name).to.be.equal("c")
+            expect(obj.right.right.name).to.be.equal("d")
         });
     });
 });
