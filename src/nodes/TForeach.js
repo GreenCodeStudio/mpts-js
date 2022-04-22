@@ -1,5 +1,4 @@
 import {TNode} from "./TNode";
-import {base} from "mocha/lib/reporters";
 
 export class TForeach extends TNode {
     children = [];

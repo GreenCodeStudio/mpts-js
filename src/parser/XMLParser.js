@@ -1,7 +1,6 @@
 import {TDocumentFragment} from "../nodes/TDocumentFragment";
 import {TText} from "../nodes/TText";
 import {TElement} from "../nodes/TElement";
-import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 import {TEVariable} from "../nodes/expressions/TEVariable";
 import {TExpressionText} from "../nodes/TExpressionText";
 import {TAttribute} from "../nodes/TAttribute";
@@ -12,6 +11,7 @@ import {AbstractParser} from "./AbstractParser";
 import {TLoop} from "../nodes/TLoop";
 import {TComment} from "../nodes/TComment";
 import {TForeach} from "../nodes/TForeach";
+import {MptsParserError} from "./MptsParserError";
 
 export class XMLParser extends AbstractParser {
     constructor(text) {
@@ -45,7 +45,7 @@ export class XMLParser extends AbstractParser {
                     } else if (element instanceof TElement && element.tagName == name) {
                         this.openElements.pop();
                     } else {
-                        throw new Error(`Element <${name}> not opened as last`);
+                        throw new MptsParserError(`Last opened element is not <${name}>`);
                     }
                 } else {
                     this.position++;

@@ -7,7 +7,7 @@ const {document} = (new JSDOM(`...`)).window;
 
 function fragmentToHtml(fragment) {
     const div = document.createElement('div');
-    for (const childNode of fragment.childNodes) {
+    for (const childNode of [...fragment.childNodes]) {
         div.append(childNode);
     }
     return div.innerHTML;
@@ -89,6 +89,13 @@ describe('Execution', () => {
     });
 
     it('loop', async () => {
+        const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("bbbbbbbbbb");
+    })
+    it('loop by variable', async () => {
         const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
         const env = new Environment();
         env.document = document;

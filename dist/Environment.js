@@ -1,22 +1,31 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Environment = void 0;
 
-var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+class Environment {
+  constructor() {
+    _defineProperty(this, "allowExecution", false);
 
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+    _defineProperty(this, "variables", {});
 
-var Environment = /*#__PURE__*/(0, _createClass2["default"])(function Environment() {
-  (0, _classCallCheck2["default"])(this, Environment);
-  (0, _defineProperty2["default"])(this, "allowExecution", false);
-  (0, _defineProperty2["default"])(this, "variables", {});
-  (0, _defineProperty2["default"])(this, "document", global.document);
-});
+    _defineProperty(this, "document", global.document);
+  }
+
+  scope() {
+    var newVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var ret = new Environment();
+    ret.allowExecution = this.allowExecution;
+    ret.variables = Object.create(this.variables);
+    ret.document = this.document;
+    Object.assign(ret.variables, newVariables);
+    return ret;
+  }
+
+}
+
 exports.Environment = Environment;

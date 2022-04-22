@@ -2,8 +2,13 @@ import {getUniqName} from "../utils";
 import he from "he";
 import {TNode} from "./TNode";
 
-export class TComment extends TNode{
+export class TComment extends TNode {
     text = "";
+
+    constructor(text = "") {
+        super();
+        this.text = text;
+    }
 
     execute(env) {
         return env.document.createComment(he.decode(this.text));

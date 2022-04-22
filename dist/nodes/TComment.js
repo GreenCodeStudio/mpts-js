@@ -3,13 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TExpressionText = void 0;
+exports.TComment = void 0;
 
 var _utils = require("../utils");
 
 var _he = _interopRequireDefault(require("he"));
-
-var _TText = require("./TText");
 
 var _TNode = require("./TNode");
 
@@ -17,20 +15,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-class TExpressionText extends _TNode.TNode {
+class TComment extends _TNode.TNode {
   constructor() {
-    super(...arguments);
+    var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    super();
 
-    _defineProperty(this, "expression", null);
+    _defineProperty(this, "text", "");
+
+    this.text = text;
   }
 
   execute(env) {
-    return env.document.createTextNode(this.expression.execute(env));
+    return env.document.createComment(_he.default.decode(this.text));
   }
 
   compileJS() {
     var rootName = (0, _utils.getUniqName)();
-    var code = 'const ' + rootName + '=document.createTextNode(' + this.expression.compileJS().code + ');';
+    var code = 'const ' + rootName + '=document.createComment(' + JSON.stringify(_he.default.decode(this.text)) + ');';
     return {
       code,
       rootName
@@ -39,4 +40,4 @@ class TExpressionText extends _TNode.TNode {
 
 }
 
-exports.TExpressionText = TExpressionText;
+exports.TComment = TComment;

@@ -1,42 +1,41 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.AbstractParser = void 0;
 
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+class AbstractParser {
+  readUntill(regexp) {
+    var ret = '';
 
-var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+    while (this.position < this.text.length) {
+      var char = this.text[this.position];
+      if (regexp.test(char)) break;
+      ret += char;
+      this.position++;
+    }
 
-var AbstractParser = /*#__PURE__*/function () {
-  function AbstractParser() {
-    (0, _classCallCheck2["default"])(this, AbstractParser);
+    return ret;
   }
 
-  (0, _createClass2["default"])(AbstractParser, [{
-    key: "readUntill",
-    value: function readUntill(regexp) {
-      var ret = '';
+  skipWhitespace() {
+    this.readUntill(/\S/);
+  }
 
-      while (this.position < this.text.length) {
-        var _char = this.text[this.position];
-        if (regexp.test(_char)) break;
-        ret += _char;
-        this.position++;
-      }
+  readUntillText(text) {
+    var ret = '';
 
-      return ret;
+    while (this.position < this.text.length) {
+      var char = this.text[this.position];
+      if (this.text.substr(this.position, this.position + text.length) == text) break;
+      ret += char;
+      this.position++;
     }
-  }, {
-    key: "skipWhitespace",
-    value: function skipWhitespace() {
-      this.readUntill(/\S/);
-    }
-  }]);
-  return AbstractParser;
-}();
+
+    return ret;
+  }
+
+}
 
 exports.AbstractParser = AbstractParser;

@@ -1,8 +1,9 @@
 import {getUniqName} from "../utils";
 import he from "he";
 import {TText} from "./TText";
+import {TNode} from "./TNode";
 
-export class TExpressionText extends TText{
+export class TExpressionText extends TNode{
     expression = null;
 
     execute(env) {

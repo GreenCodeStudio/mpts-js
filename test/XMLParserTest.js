@@ -12,6 +12,7 @@ const {TENumber} = require("../src/nodes/expressions/TENumber");
 const {TLoop} = require("../src/nodes/TLoop");
 const {TComment} = require("../src/nodes/TComment");
 const {TForeach} = require("../src/nodes/TForeach");
+const {MptsParserError} = require("../src/parser/MptsParserError");
 
 describe('Parser', () => {
     it('basic text', async () => {
@@ -33,6 +34,14 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("div");
     });
+    it('not closed element', async () => {
+        expect(()=>XMLParser.Parse("<div>")).to.throw(MptsParserError);
+        expect(()=>XMLParser.Parse("<div>")).to.throw(/Element <div> not closed/);
+    });
+    it('not opened element', async () => {
+        expect(()=>XMLParser.Parse("</div>")).to.throw(MptsParserError);
+        expect(()=>XMLParser.Parse("</div>")).to.throw(/Last opened element is not <div>/);
+    });
     it('elementsinside', async () => {
         const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");
         expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -43,6 +52,10 @@ describe('Parser', () => {
         expect(obj.children[0].children[0].children[0].tagName).to.be.equals("strong");
         expect(obj.children[0].children[0].children[1]).to.be.instanceOf(TElement);
         expect(obj.children[0].children[0].children[1].tagName).to.be.equals("span");
+    });
+    it('bad order of close', async () => {
+        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
+        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <span>/);
     });
     it('element with attributes', async () => {
         const obj = XMLParser.Parse("<img src=\"a.png\" alt='a'/>");
