@@ -8,6 +8,10 @@ const {TIf} = require("../src/nodes/TIf");
 const {TEVariable} = require("../src/nodes/expressions/TEVariable");
 const {TEString} = require("../src/nodes/expressions/TEString");
 const {TEBoolean} = require("../src/nodes/expressions/TEBoolean");
+const {TENumber} = require("../src/nodes/expressions/TENumber");
+const {TLoop} = require("../src/nodes/TLoop");
+const {TComment} = require("../src/nodes/TComment");
+const {TForeach} = require("../src/nodes/TForeach");
 
 describe('Parser', () => {
     it('basic text', async () => {
@@ -90,9 +94,10 @@ describe('Parser', () => {
         const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TLoop);
-        expect(obj.children[0].count).to.be.equal(10);
+        expect(obj.children[0].count).to.be.instanceOf(TENumber);
+        expect(obj.children[0].count.value).to.be.equal(10);
         expect(obj.children[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].children[0].value).to.be.equal('b');
+        expect(obj.children[0].children[0].text).to.be.equal('b');
     })
     it('foreach basic', async () => {
         const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
@@ -101,10 +106,10 @@ describe('Parser', () => {
         expect(obj.children[0].collection).to.be.instanceOf(TEVariable);
         expect(obj.children[0].collection.name).to.be.equal('a');
         expect(obj.children[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].children[0].value).to.be.equal('b');
+        expect(obj.children[0].children[0].text).to.be.equal('b');
     });
     it('foreach advanced', async () => {
-        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</:foreach>");
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TForeach);
         expect(obj.children[0].collection).to.be.instanceOf(TEVariable);

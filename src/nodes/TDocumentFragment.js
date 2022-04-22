@@ -1,6 +1,7 @@
 import {getUniqName} from "../utils";
+import {TNode} from "./TNode";
 
-export class TDocumentFragment {
+export class TDocumentFragment extends TNode{
     children = []
 
     execute(env) {

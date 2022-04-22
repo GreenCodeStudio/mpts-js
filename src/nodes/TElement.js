@@ -1,6 +1,7 @@
 import {getUniqName} from "../utils";
+import {TNode} from "./TNode";
 
-export class TElement {
+export class TElement extends TNode{
     tagName = "";
     children = [];
     attributes = [];

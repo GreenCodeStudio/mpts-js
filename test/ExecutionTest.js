@@ -104,7 +104,7 @@ describe('Execution', () => {
         expect(result.textContent).to.be.equal("bbbbb");
     })
     it('foreach advanced', async () => {
-        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</:foreach>");
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         const env = new Environment();
         env.document = document;
         env.variables.a = ['a','b','c','d','e'];

@@ -1,6 +1,7 @@
 import {getUniqName} from "../utils";
+import {TNode} from "./TNode";
 
-export class TIf {
+export class TIf extends TNode{
     conditions = []
     else = null;
 

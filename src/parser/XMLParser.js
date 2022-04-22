@@ -9,6 +9,9 @@ import {TIf} from "../nodes/TIf";
 import {ExpressionParser} from "./ExpressionParser";
 import {TEString} from "../nodes/expressions/TEString";
 import {AbstractParser} from "./AbstractParser";
+import {TLoop} from "../nodes/TLoop";
+import {TComment} from "../nodes/TComment";
+import {TForeach} from "../nodes/TForeach";
 
 export class XMLParser extends AbstractParser {
     constructor(text) {
@@ -28,7 +31,12 @@ export class XMLParser extends AbstractParser {
             let element = this.openElements[this.openElements.length - 1];
             let last = element.children[element.children.length - 1];
             if (char == '<') {
-                if (this.text[this.position + 1] == '/') {
+                if (this.text.substr(this.position, this.position + 4) == '<!--') {
+                    this.position += 4;
+                    let text = this.readUntillText('-->');
+                    this.position += 3;
+                    element.children.push(new TComment(text))
+                } else if (this.text[this.position + 1] == '/') {
                     this.position += 2;
                     let name = this.parseElementEnd();
 
@@ -185,8 +193,27 @@ export class XMLParser extends AbstractParser {
             last.else = {children: []};
             if (!result.autoclose)
                 this.openElements.push(last);
+        } else if (result.element.tagName.toLowerCase() == ':loop') {
+            let count = result.element.attributes.find(x => x.name == 'count').expression;
+            let node = new TLoop(count);
+
+            element.children.push(node);
+
+            if (!result.autoclose)
+                this.openElements.push(node);
+        } else if (result.element.tagName.toLowerCase() == ':foreach') {
+            let collection = result.element.attributes.find(x => x.name == 'collection').expression;
+            let item = result.element.attributes.find(x => x.name == 'item')?.expression.name;
+            let key = result.element.attributes.find(x => x.name == 'key')?.expression.name;
+            let node = new TForeach(collection, item, key);
+
+            element.children.push(node);
+
+            if (!result.autoclose)
+                this.openElements.push(node);
         }
     }
+
 
     closeSpecialElement(tagName, openElements) {
         const last = openElements[openElements.length - 1]
@@ -208,6 +235,18 @@ export class XMLParser extends AbstractParser {
                 openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:else>");
+            }
+        } else if (tagName.toLowerCase() == ':loop') {
+            if (last instanceof TLoop) {
+                openElements.pop()
+            } else {
+                throw new Error("Last opened element is not <:loop>");
+            }
+        } else if (tagName.toLowerCase() == ':foreach') {
+            if (last instanceof TForeach) {
+                openElements.pop()
+            } else {
+                throw new Error("Last opened element is not <:foreach>");
             }
         }
     }
