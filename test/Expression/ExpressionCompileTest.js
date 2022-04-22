@@ -19,6 +19,10 @@ describe('ExpressionTest', () => {
             const obj = ExpressionParser.Parse("false");
             expect(obj.compileJS().code).to.be.equal("false")
         });
+        it('property', async () => {
+            const obj = ExpressionParser.Parse("var1.sub.sub2");
+            expect(obj.compileJS().code).to.be.equal("variables[\"var1\"][\"sub\"][\"sub2\"]")
+        });
         it('number', async () => {
             const obj = ExpressionParser.Parse("123");
             expect(obj).to.be.instanceOf(TENumber)

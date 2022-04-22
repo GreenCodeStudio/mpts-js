@@ -24,6 +24,15 @@ describe('ExpressionTest', () => {
             expect(obj).to.be.instanceOf(TEBoolean)
             expect(obj.value).to.be.equal(false)
         });
+        it('property', async () => {
+            const obj = ExpressionParser.Parse("var1.sub.sub2");
+            expect(obj).to.be.instanceOf(TEProperty)
+            expect(obj.name).to.be.equal("sub2")
+            expect(obj.source).to.be.instanceOf(TEProperty)
+            expect(obj.source.name).to.be.equal("sub")
+            expect(obj.source.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.source.name).to.be.equal("var1")
+        });
         it('number', async () => {
             const obj = ExpressionParser.Parse("123");
             expect(obj).to.be.instanceOf(TENumber)

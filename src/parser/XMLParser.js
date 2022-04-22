@@ -215,36 +215,37 @@ export class XMLParser extends AbstractParser {
     }
 
 
-    closeSpecialElement(tagName, openElements) {
-        const last = openElements[openElements.length - 1]
-        if (tagName.toLowerCase() == ':if') {
+    closeSpecialElement(tagName) {
+        tagName = tagName.toLowerCase();
+        const last = this.openElements[this.openElements.length - 1]
+        if (tagName == ':if') {
             if (last instanceof TIf && last.conditions.length == 1 && last.else == null) {
-                openElements.pop()
+                this.openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:if>");
             }
-        } else if (tagName.toLowerCase() == ':else-if') {
+        } else if (tagName == ':else-if') {
             if (last instanceof TIf && last.conditions.length > 1 && last.else == null) {
-                openElements.pop()
+                this.openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:else-if>");
             }
 
-        } else if (tagName.toLowerCase() == ':else') {
+        } else if (tagName == ':else') {
             if (last instanceof TIf && last.else != null) {
-                openElements.pop()
+                this.openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:else>");
             }
-        } else if (tagName.toLowerCase() == ':loop') {
+        } else if (tagName == ':loop') {
             if (last instanceof TLoop) {
-                openElements.pop()
+                this.openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:loop>");
             }
-        } else if (tagName.toLowerCase() == ':foreach') {
+        } else if (tagName == ':foreach') {
             if (last instanceof TForeach) {
-                openElements.pop()
+                this.openElements.pop()
             } else {
                 throw new Error("Last opened element is not <:foreach>");
             }

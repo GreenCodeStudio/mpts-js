@@ -1,9 +1,11 @@
 import {getUniqName} from "../../utils";
+import {TEExpression} from "./TEExpression";
 
-export class TEVariable {
+export class TEVariable extends TEExpression {
     name = "";
 
     constructor(name = "") {
+        super();
         this.name = name;
     }
 

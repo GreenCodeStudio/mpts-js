@@ -1,5 +1,8 @@
-export class TEEqual {
+import {TEExpression} from "./TEExpression";
+
+export class TEEqual extends TEExpression {
     constructor(left, right) {
+        super();
         this.left = left;
         this.right = right;
     }

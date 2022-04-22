@@ -100,7 +100,6 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TIf);
         expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
         expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
         expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
     });
     it('loop', async () => {

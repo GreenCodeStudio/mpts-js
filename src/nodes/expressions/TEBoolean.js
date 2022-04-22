@@ -1,9 +1,11 @@
 import {getUniqName} from "../../utils";
+import {TEExpression} from "./TEExpression";
 
-export class TEBoolean {
+export class TEBoolean extends TEExpression{
     value = false;
 
     constructor(value = false) {
+        super();
         this.value = value;
     }
 

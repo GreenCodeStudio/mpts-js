@@ -1,9 +1,11 @@
 import {getUniqName} from "../../utils";
+import {TEExpression} from "./TEExpression";
 
-export class TENumber {
+export class TENumber extends TEExpression {
     value = NaN;
 
     constructor(value = 0) {
+        super();
         this.value = +value;
     }
 

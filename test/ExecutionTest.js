@@ -96,11 +96,12 @@ describe('Execution', () => {
         expect(result.textContent).to.be.equal("bbbbbbbbbb");
     })
     it('loop by variable', async () => {
-        const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
+        const obj = XMLParser.Parse("<:loop count=a>b</:loop>");
         const env = new Environment();
         env.document = document;
+        env.variables.a = 3;
         const result = obj.execute(env);
-        expect(result.textContent).to.be.equal("bbbbbbbbbb");
+        expect(result.textContent).to.be.equal("bbb");
     })
     it('foreach basic', async () => {
         const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
