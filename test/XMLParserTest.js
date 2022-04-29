@@ -37,10 +37,12 @@ describe('Parser', () => {
     it('not closed element', async () => {
         expect(()=>XMLParser.Parse("<div>")).to.throw(MptsParserError);
         expect(()=>XMLParser.Parse("<div>")).to.throw(/Element <div> not closed/);
+        expect(()=>XMLParser.Parse("<div>")).to.throw(/1:5/);
     });
     it('not opened element', async () => {
         expect(()=>XMLParser.Parse("</div>")).to.throw(MptsParserError);
         expect(()=>XMLParser.Parse("</div>")).to.throw(/Last opened element is not <div>/);
+        expect(()=>XMLParser.Parse("</div>")).to.throw(/1:0/);
     });
     it('elementsinside', async () => {
         const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");

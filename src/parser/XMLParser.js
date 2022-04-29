@@ -27,11 +27,12 @@ export class XMLParser extends AbstractParser {
 
     parseNormal() {
         while (this.position < this.text.length) {
+            const positionCopy = this.position;
             const char = this.text[this.position];
             let element = this.openElements[this.openElements.length - 1];
             let last = element.children[element.children.length - 1];
             if (char == '<') {
-                if (this.text.substr(this.position, this.position + 4) == '<!--') {
+                if (this.text.substr(this.position, 4) == '<!--') {
                     this.position += 4;
                     let text = this.readUntillText('-->');
                     this.position += 3;
@@ -45,7 +46,8 @@ export class XMLParser extends AbstractParser {
                     } else if (element instanceof TElement && element.tagName == name) {
                         this.openElements.pop();
                     } else {
-                        throw new MptsParserError(`Last opened element is not <${name}>`);
+                        this.position = positionCopy;
+                        this.throw(`Last opened element is not <${name}>`);
                     }
                 } else {
                     this.position++;
@@ -74,6 +76,9 @@ export class XMLParser extends AbstractParser {
                 last.text += char;
                 this.position++;
             }
+        }
+        if (this.openElements.length > 1) {
+            this.throw(`Element <${this.openElements[this.openElements.length - 1].tagName}> not closed`)
         }
         return this.openElements[0];
     }
@@ -178,7 +183,7 @@ export class XMLParser extends AbstractParser {
         } else if (result.element.tagName.toLowerCase() == ':else-if') {
             const last = element.children[element.children.length - 1];
             if (!(last instanceof TIf && last.else == null))
-                throw new Error("need if before else-if")
+                this.throw("need if before else-if")
 
             const expression = result.element.attributes.find(x => x.name == 'condition').expression;
             last.conditions.push({expression, children: []});
@@ -188,7 +193,7 @@ export class XMLParser extends AbstractParser {
         } else if (result.element.tagName.toLowerCase() == ':else') {
             const last = element.children[element.children.length - 1];
             if (!(last instanceof TIf && last.else == null))
-                throw new Error("need if before else")
+                this.throw("need if before else")
 
             last.else = {children: []};
             if (!result.autoclose)
@@ -222,32 +227,32 @@ export class XMLParser extends AbstractParser {
             if (last instanceof TIf && last.conditions.length == 1 && last.else == null) {
                 this.openElements.pop()
             } else {
-                throw new Error("Last opened element is not <:if>");
+                this.throw("Last opened element is not <:if>");
             }
         } else if (tagName == ':else-if') {
             if (last instanceof TIf && last.conditions.length > 1 && last.else == null) {
                 this.openElements.pop()
             } else {
-                throw new Error("Last opened element is not <:else-if>");
+                this.throw("Last opened element is not <:else-if>");
             }
 
         } else if (tagName == ':else') {
             if (last instanceof TIf && last.else != null) {
                 this.openElements.pop()
             } else {
-                throw new Error("Last opened element is not <:else>");
+                this.throw("Last opened element is not <:else>");
             }
         } else if (tagName == ':loop') {
             if (last instanceof TLoop) {
                 this.openElements.pop()
             } else {
-                throw new Error("Last opened element is not <:loop>");
+                this.throw("Last opened element is not <:loop>");
             }
         } else if (tagName == ':foreach') {
             if (last instanceof TForeach) {
                 this.openElements.pop()
             } else {
-                throw new Error("Last opened element is not <:foreach>");
+                this.throw("Last opened element is not <:foreach>");
             }
         }
     }

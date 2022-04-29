@@ -52,7 +52,7 @@ class XMLParser extends _AbstractParser.AbstractParser {
       var last = element.children[element.children.length - 1];
 
       if (char == '<') {
-        if (this.text.substr(this.position, this.position + 4) == '<!--') {
+        if (this.text.substr(this.position, 4) == '<!--') {
           this.position += 4;
           var text = this.readUntillText('-->');
           this.position += 3;
