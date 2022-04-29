@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.AbstractParser = void 0;
 
+var _MptsParserError = require("./MptsParserError");
+
 class AbstractParser {
   readUntill(regexp) {
     var ret = '';
@@ -28,12 +30,17 @@ class AbstractParser {
 
     while (this.position < this.text.length) {
       var char = this.text[this.position];
-      if (this.text.substr(this.position, this.position + text.length) == text) break;
+      if (this.text.substr(this.position, text.length) == text) break;
       ret += char;
       this.position++;
     }
 
     return ret;
+  }
+
+  throw(message) {
+    var lines = this.text.substr(0, this.position).split('\n');
+    throw new _MptsParserError.MptsParserError(message, lines.length, lines[lines.length - 1].length, this.text.substr(this.position, 10));
   }
 
 }

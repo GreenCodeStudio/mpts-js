@@ -22,7 +22,7 @@ export class AbstractParser {
         let ret = '';
         while (this.position < this.text.length) {
             const char = this.text[this.position];
-            if (this.text.substr(this.position, this.position + text.length) == text)
+            if (this.text.substr(this.position, text.length) == text)
                 break;
             ret += char;
             this.position++;

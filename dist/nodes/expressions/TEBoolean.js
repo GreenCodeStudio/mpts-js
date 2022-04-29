@@ -7,11 +7,14 @@ exports.TEBoolean = void 0;
 
 var _utils = require("../../utils");
 
+var _TEExpression = require("./TEExpression");
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-class TEBoolean {
+class TEBoolean extends _TEExpression.TEExpression {
   constructor() {
     var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    super();
 
     _defineProperty(this, "value", false);
 

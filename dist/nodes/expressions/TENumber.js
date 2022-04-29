@@ -7,11 +7,14 @@ exports.TENumber = void 0;
 
 var _utils = require("../../utils");
 
+var _TEExpression = require("./TEExpression");
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-class TENumber {
+class TENumber extends _TEExpression.TEExpression {
   constructor() {
     var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+    super();
 
     _defineProperty(this, "value", NaN);
 

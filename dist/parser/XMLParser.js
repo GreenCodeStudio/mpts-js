@@ -47,6 +47,7 @@ class XMLParser extends _AbstractParser.AbstractParser {
 
   parseNormal() {
     while (this.position < this.text.length) {
+      var positionCopy = this.position;
       var char = this.text[this.position];
       var element = this.openElements[this.openElements.length - 1];
       var last = element.children[element.children.length - 1];
@@ -66,7 +67,8 @@ class XMLParser extends _AbstractParser.AbstractParser {
           } else if (element instanceof _TElement.TElement && element.tagName == name) {
             this.openElements.pop();
           } else {
-            throw new _MptsParserError.MptsParserError("Last opened element is not <".concat(name, ">"));
+            this.position = positionCopy;
+            this.throw("Last opened element is not <".concat(name, ">"));
           }
         } else {
           this.position++;
@@ -96,6 +98,10 @@ class XMLParser extends _AbstractParser.AbstractParser {
         last.text += char;
         this.position++;
       }
+    }
+
+    if (this.openElements.length > 1) {
+      this.throw("Element <".concat(this.openElements[this.openElements.length - 1].tagName, "> not closed"));
     }
 
     return this.openElements[0];
@@ -214,7 +220,7 @@ class XMLParser extends _AbstractParser.AbstractParser {
       if (!result.autoclose) this.openElements.push(node);
     } else if (result.element.tagName.toLowerCase() == ':else-if') {
       var last = element.children[element.children.length - 1];
-      if (!(last instanceof _TIf.TIf && last.else == null)) throw new Error("need if before else-if");
+      if (!(last instanceof _TIf.TIf && last.else == null)) this.throw("need if before else-if");
       var _expression = result.element.attributes.find(x => x.name == 'condition').expression;
       last.conditions.push({
         expression: _expression,
@@ -223,7 +229,7 @@ class XMLParser extends _AbstractParser.AbstractParser {
       if (!result.autoclose) this.openElements.push(last);
     } else if (result.element.tagName.toLowerCase() == ':else') {
       var _last = element.children[element.children.length - 1];
-      if (!(_last instanceof _TIf.TIf && _last.else == null)) throw new Error("need if before else");
+      if (!(_last instanceof _TIf.TIf && _last.else == null)) this.throw("need if before else");
       _last.else = {
         children: []
       };
@@ -249,38 +255,39 @@ class XMLParser extends _AbstractParser.AbstractParser {
     }
   }
 
-  closeSpecialElement(tagName, openElements) {
-    var last = openElements[openElements.length - 1];
+  closeSpecialElement(tagName) {
+    tagName = tagName.toLowerCase();
+    var last = this.openElements[this.openElements.length - 1];
 
-    if (tagName.toLowerCase() == ':if') {
+    if (tagName == ':if') {
       if (last instanceof _TIf.TIf && last.conditions.length == 1 && last.else == null) {
-        openElements.pop();
+        this.openElements.pop();
       } else {
-        throw new Error("Last opened element is not <:if>");
+        this.throw("Last opened element is not <:if>");
       }
-    } else if (tagName.toLowerCase() == ':else-if') {
+    } else if (tagName == ':else-if') {
       if (last instanceof _TIf.TIf && last.conditions.length > 1 && last.else == null) {
-        openElements.pop();
+        this.openElements.pop();
       } else {
-        throw new Error("Last opened element is not <:else-if>");
+        this.throw("Last opened element is not <:else-if>");
       }
-    } else if (tagName.toLowerCase() == ':else') {
+    } else if (tagName == ':else') {
       if (last instanceof _TIf.TIf && last.else != null) {
-        openElements.pop();
+        this.openElements.pop();
       } else {
-        throw new Error("Last opened element is not <:else>");
+        this.throw("Last opened element is not <:else>");
       }
-    } else if (tagName.toLowerCase() == ':loop') {
+    } else if (tagName == ':loop') {
       if (last instanceof _TLoop.TLoop) {
-        openElements.pop();
+        this.openElements.pop();
       } else {
-        throw new Error("Last opened element is not <:loop>");
+        this.throw("Last opened element is not <:loop>");
       }
-    } else if (tagName.toLowerCase() == ':foreach') {
+    } else if (tagName == ':foreach') {
       if (last instanceof _TForeach.TForeach) {
-        openElements.pop();
+        this.openElements.pop();
       } else {
-        throw new Error("Last opened element is not <:foreach>");
+        this.throw("Last opened element is not <:foreach>");
       }
     }
   }
