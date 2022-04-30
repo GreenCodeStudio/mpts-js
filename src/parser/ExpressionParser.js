@@ -5,8 +5,9 @@ import {TENumber} from "../nodes/expressions/TENumber";
 import {TEString} from "../nodes/expressions/TEString";
 import {TEEqual} from "../nodes/expressions/TEEqual";
 import {AbstractParser} from "./AbstractParser";
+import {TEProperty} from "../nodes/expressions/TEProperty";
 
-export class ExpressionParser extends AbstractParser{
+export class ExpressionParser extends AbstractParser {
     constructor(text) {
         super();
         this.text = text;
@@ -17,12 +18,16 @@ export class ExpressionParser extends AbstractParser{
         return (new ExpressionParser(text)).parseNormal();
     }
 
-    parseNormal(endLevel=0) {
+    parseNormal(endLevel = 0) {
         let lastNode = null;
         while (this.position < this.text.length) {
             const char = this.text[this.position];
             if (/\s/.test(char)) {
                 this.position++;
+            } else if (lastNode && char == '.') {
+                this.position++;
+                let name = this.readUntill(/['"\(\)=\.\s]/);
+                lastNode = new TEProperty(lastNode, name);
             } else if (/[0-9\.\-+]/.test(char)) {
                 let value = this.readUntill(/\s/);
                 lastNode = new TENumber(+value);
@@ -36,25 +41,23 @@ export class ExpressionParser extends AbstractParser{
                 let value = this.readUntill(/'/);
                 this.position++;
                 lastNode = new TEString(value);
-            }
-            else if (char == "(") {
+            } else if (char == "(") {
                 this.position++;
                 let value = this.parseNormal(1);
                 this.position++;
                 lastNode = value;
-            }
-            else if (char == ")") {
-                if(endLevel>=1){
+            } else if (char == ")") {
+                if (endLevel >= 1) {
                     break;
-                }else{
+                } else {
                     throw new Error("( not opened");
                 }
-            }else if (char == "=" && this.text[this.position+1]=="=") {
-                this.position+=2;
-                let right=this.parseNormal(2);
-                lastNode=new TEEqual(lastNode, right);
+            } else if (char == "=" && this.text[this.position + 1] == "=") {
+                this.position += 2;
+                let right = this.parseNormal(2);
+                lastNode = new TEEqual(lastNode, right);
             } else {
-                let name = this.readUntill(/['"\(\)=\s]/);
+                let name = this.readUntill(/['"\(\)=\.\s]/);
                 if (name == 'true')
                     lastNode = new TEBoolean(true)
                 else if (name == 'false')

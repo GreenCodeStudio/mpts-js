@@ -11,6 +11,10 @@ describe('ExpressionTest', () => {
             const obj = ExpressionParser.Parse("var1");
             expect(obj.compileJS().code).to.be.equal("variables[\"var1\"]")
         });
+        it('variableInScope', async () => {
+            const obj = ExpressionParser.Parse("var1");
+            expect(obj.compileJS(new Set(['var1'])).code).to.be.equal("var1")
+        });
         it('boolTrue', async () => {
             const obj = ExpressionParser.Parse("true");
             expect(obj.compileJS().code).to.be.equal("true")

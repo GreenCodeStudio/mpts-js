@@ -1,4 +1,5 @@
 import {TNode} from "./TNode";
+import {getUniqName} from "../utils";
 
 export class TForeach extends TNode {
     children = [];
@@ -28,5 +29,29 @@ export class TForeach extends TNode {
             i++;
         }
         return ret;
+    }
+
+    compileJS(scopedVariables = new Set()) {
+        let rootName = getUniqName();
+        let code = 'let ' + rootName + '=document.createDocumentFragment();';
+
+        code += 'for(let [_foreachKey,_foreachValue] of Object.entries(' + this.collection.compileJS().code + ')){';
+        let subScope = new Set(Array.from(scopedVariables));
+
+        if (this.key) {
+            code += 'let ' + this.key + ' = _foreachKey;'
+            subScope.add(this.key);
+        }
+        if (this.item) {
+            code += 'let ' + this.item + ' = _foreachValue;'
+            subScope.add(this.item);
+        }
+        for (const child of this.children) {
+            let childResult = child.compileJS(subScope);
+            code += childResult.code;
+            code += rootName + ".append(" + childResult.rootName + ");"
+        }
+        code += '}';
+        return {code, rootName};
     }
 }

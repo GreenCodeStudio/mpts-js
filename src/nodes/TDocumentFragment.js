@@ -12,7 +12,7 @@ export class TDocumentFragment extends TNode{
         return ret;
     }
 
-    compileJS() {
+    compileJS(scopedVariables=new Set()) {
         let rootName = getUniqName();
         let code = 'const ' + rootName + '=document.createDocumentFragment();';
         for (const child of this.children) {

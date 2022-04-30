@@ -17,14 +17,14 @@ export class TElement extends TNode{
         return ret;
     }
 
-    compileJS() {
+    compileJS(scopedVariables = new Set()) {
         let rootName = getUniqName();
         let code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
         for (const attr of this.attributes) {
-            code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS().code + ");";
+            code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";
         }
         for (const child of this.children) {
-            let childResult = child.compileJS();
+            let childResult = child.compileJS(scopedVariables);
             code += childResult.code;
             code += rootName + ".append(" + childResult.rootName + ");"
         }

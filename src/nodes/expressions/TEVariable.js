@@ -13,8 +13,13 @@ export class TEVariable extends TEExpression {
         return env.variables[this.name];
     }
 
-    compileJS() {
-        let code = 'variables[' + JSON.stringify(this.name) + ']';
+    compileJS(scopedVariables = new Set()) {
+        let code;
+        if (scopedVariables.has(this.name)) {
+            code = this.safeJsName(this.name);
+        } else {
+            code = 'variables[' + JSON.stringify(this.name) + ']';
+        }
         return {code};
     }
 }

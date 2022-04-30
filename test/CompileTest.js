@@ -47,4 +47,20 @@ describe('Compile', () => {
         const result = eval(compiled.code + compiled.rootName);
         expect(fragmentToHtml(result)).to.be.equal("<div a=\"1\" b=\"2\" c=\"3\" d=\"4\" e=\"5\"></div>");
     });
+    it('foreach basic', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables={a:  [1,2,3,4,5]};
+        const result = eval(compiled.code + compiled.rootName);
+        expect(result.textContent).to.be.equal("bbbbb");
+    })
+    it('foreach advanced', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables={a:   ['a','b','c','d','e']};
+        const result = eval(compiled.code + compiled.rootName);
+        expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
+    })
 })

@@ -10,9 +10,9 @@ export class TExpressionText extends TNode{
         return env.document.createTextNode(this.expression.execute(env));
     }
 
-    compileJS() {
+    compileJS(scopedVariables = new Set()) {
         let rootName = getUniqName();
-        let code = 'const ' + rootName + '=document.createTextNode(' + this.expression.compileJS().code + ');';
+        let code = 'const ' + rootName + '=document.createTextNode(' + this.expression.compileJS(scopedVariables).code + ');';
         return {code, rootName};
     }
 }

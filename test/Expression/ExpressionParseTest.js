@@ -2,6 +2,7 @@ import {expect} from "chai";
 import {TEString} from "../../src/nodes/expressions/TEString";
 import {TENumber} from "../../src/nodes/expressions/TENumber";
 import {TEEqual} from "../../src/nodes/expressions/TEEqual";
+import {TEProperty} from "../../src/nodes/expressions/TEProperty";
 
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
