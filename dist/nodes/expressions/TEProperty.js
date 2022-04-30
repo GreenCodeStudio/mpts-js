@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TEVariable = void 0;
+exports.TEProperty = void 0;
 
 var _utils = require("../../utils");
 
@@ -11,30 +11,26 @@ var _TEExpression = require("./TEExpression");
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-class TEVariable extends _TEExpression.TEExpression {
-  constructor() {
-    var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+class TEProperty extends _TEExpression.TEExpression {
+  constructor(source) {
+    var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
     super();
+
+    _defineProperty(this, "source", "");
 
     _defineProperty(this, "name", "");
 
+    this.source = source;
     this.name = name;
   }
 
   execute(env) {
-    return env.variables[this.name];
+    return this.source.execute(env)[this.name];
   }
 
   compileJS() {
     var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
-    var code;
-
-    if (scopedVariables.has(this.name)) {
-      code = this.safeJsName(this.name);
-    } else {
-      code = 'variables[' + JSON.stringify(this.name) + ']';
-    }
-
+    var code = this.source.compileJS(scopedVariables).code + '[' + JSON.stringify(this.name) + ']';
     return {
       code
     };
@@ -42,4 +38,4 @@ class TEVariable extends _TEExpression.TEExpression {
 
 }
 
-exports.TEVariable = TEVariable;
+exports.TEProperty = TEProperty;

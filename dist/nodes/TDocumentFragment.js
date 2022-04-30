@@ -29,6 +29,7 @@ class TDocumentFragment extends _TNode.TNode {
   }
 
   compileJS() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
     var rootName = (0, _utils.getUniqName)();
     var code = 'const ' + rootName + '=document.createDocumentFragment();';
 

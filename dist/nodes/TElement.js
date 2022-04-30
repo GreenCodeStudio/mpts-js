@@ -37,15 +37,16 @@ class TElement extends _TNode.TNode {
   }
 
   compileJS() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
     var rootName = (0, _utils.getUniqName)();
     var code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
 
     for (var attr of this.attributes) {
-      code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS().code + ");";
+      code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";
     }
 
     for (var child of this.children) {
-      var childResult = child.compileJS();
+      var childResult = child.compileJS(scopedVariables);
       code += childResult.code;
       code += rootName + ".append(" + childResult.rootName + ");";
     }

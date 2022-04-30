@@ -5,6 +5,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TEExpression = void 0;
 
-class TEExpression {}
+class TEExpression {
+  safeJsName(name) {
+    return name.replace(/\r\n\(\)\./g, '');
+  }
+
+}
 
 exports.TEExpression = TEExpression;

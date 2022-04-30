@@ -19,6 +19,8 @@ var _TEEqual = require("../nodes/expressions/TEEqual");
 
 var _AbstractParser = require("./AbstractParser");
 
+var _TEProperty = require("../nodes/expressions/TEProperty");
+
 class ExpressionParser extends _AbstractParser.AbstractParser {
   constructor(text) {
     super();
@@ -39,6 +41,10 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
 
       if (/\s/.test(char)) {
         this.position++;
+      } else if (lastNode && char == '.') {
+        this.position++;
+        var name = this.readUntill(/['"\(\)=\.\s]/);
+        lastNode = new _TEProperty.TEProperty(lastNode, name);
       } else if (/[0-9\.\-+]/.test(char)) {
         var value = this.readUntill(/\s/);
         lastNode = new _TENumber.TENumber(+value);
@@ -74,8 +80,9 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         var right = this.parseNormal(2);
         lastNode = new _TEEqual.TEEqual(lastNode, right);
       } else {
-        var name = this.readUntill(/['"\(\)=\s]/);
-        if (name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(name);
+        var _name = this.readUntill(/['"\(\)=\.\s]/);
+
+        if (_name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (_name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(_name);
       }
     }
 
