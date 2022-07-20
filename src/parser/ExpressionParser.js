@@ -50,7 +50,7 @@ export class ExpressionParser extends AbstractParser {
                     while(this.text[this.position] !=')' ){
                         if(this.position>=this.text.length )throw new Error ('Unexpected end of input');
 
-                        let value = this.parseNormal(1);
+                        let value = this.parseNormal(2);
                         lastNode.args.push(value);
                     }
                     this.position++;
