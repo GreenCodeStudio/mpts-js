@@ -58,6 +58,11 @@ describe('ExpressionTest', () => {
             const env = new Environment();
             expect(obj.execute(env)).to.be.equal("text")
         });
+        it('string concat', async () => {
+            const obj = ExpressionParser.Parse('"te":\'xt\'');
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal("text")
+        });
 
         it('equal', async () => {
             const obj = ExpressionParser.Parse('a==b');
