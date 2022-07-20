@@ -119,4 +119,13 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
     })
+
+    it('foreach if false', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a><:if condition=false>A</:if></:foreach>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = [1,2,3,4,5];
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("");
+    })
 })
