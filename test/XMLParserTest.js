@@ -132,4 +132,10 @@ describe('Parser', () => {
         expect(obj.children[0].key).to.be.equal('c');
         expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
     });
+    it('foreach inside element', async () => {
+        const obj = XMLParser.Parse("<select><:foreach collection=a>b</:foreach></select>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].children[0]).to.be.instanceOf(TForeach);
+    });
 })

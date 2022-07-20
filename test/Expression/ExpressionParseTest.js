@@ -3,6 +3,7 @@ import {TEString} from "../../src/nodes/expressions/TEString";
 import {TENumber} from "../../src/nodes/expressions/TENumber";
 import {TEEqual} from "../../src/nodes/expressions/TEEqual";
 import {TEProperty} from "../../src/nodes/expressions/TEProperty";
+import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall";
 
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
@@ -76,6 +77,14 @@ describe('ExpressionTest', () => {
             expect(obj.right).to.be.instanceOf(TEEqual)
             expect(obj.right.left.name).to.be.equal("c")
             expect(obj.right.right.name).to.be.equal("d")
+        });
+        it('methodCall', async () => {
+            const obj = ExpressionParser.Parse('fun(x)');
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("fun")
+            expect(obj.args[0]).to.be.instanceOf(TEVariable)
+            expect(obj.args[0].name).to.be.equal("x")
         });
     });
 });

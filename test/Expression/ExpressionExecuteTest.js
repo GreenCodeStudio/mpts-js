@@ -77,5 +77,12 @@ describe('ExpressionTest', () => {
             env.variables.d = 4;
             expect(obj.execute(env)).to.be.equal(true)
         });
+        it('medhod call', async () => {
+            const obj = ExpressionParser.Parse('fun(x)');
+            const env = new Environment();
+            env.variables.x = 1;
+            env.variables.fun = z=>z*10;
+            expect(obj.execute(env)).to.be.equal(10)
+        });
     });
 });

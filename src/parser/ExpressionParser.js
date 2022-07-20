@@ -6,6 +6,7 @@ import {TEString} from "../nodes/expressions/TEString";
 import {TEEqual} from "../nodes/expressions/TEEqual";
 import {AbstractParser} from "./AbstractParser";
 import {TEProperty} from "../nodes/expressions/TEProperty";
+import {TEMethodCall} from "../nodes/expressions/TEMethodCall";
 
 export class ExpressionParser extends AbstractParser {
     constructor(text) {
@@ -42,10 +43,23 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
                 lastNode = new TEString(value);
             } else if (char == "(") {
-                this.position++;
-                let value = this.parseNormal(1);
-                this.position++;
-                lastNode = value;
+                if(lastNode){
+                    lastNode=new TEMethodCall(lastNode);
+                    this.position++;
+                    this.skipWhitespace();
+                    while(this.text[this.position] !=')' ){
+                        if(this.position>=this.text.length )throw new Error ('Unexpected end of input');
+
+                        let value = this.parseNormal(1);
+                        lastNode.args.push(value);
+                    }
+                    this.position++;
+                }else {
+                    this.position++;
+                    let value = this.parseNormal(1);
+                    this.position++;
+                    lastNode = value;
+                }
             } else if (char == ")") {
                 if (endLevel >= 1) {
                     break;
