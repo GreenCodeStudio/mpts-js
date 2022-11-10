@@ -21,6 +21,10 @@ var _AbstractParser = require("./AbstractParser");
 
 var _TEProperty = require("../nodes/expressions/TEProperty");
 
+var _TEMethodCall = require("../nodes/expressions/TEMethodCall");
+
+var _TEConcatenate = require("../nodes/expressions/TEConcatenate");
+
 class ExpressionParser extends _AbstractParser.AbstractParser {
   constructor(text) {
     super();
@@ -43,7 +47,7 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position++;
       } else if (lastNode && char == '.') {
         this.position++;
-        var name = this.readUntill(/['"\(\)=\.\s]/);
+        var name = this.readUntill(/['"\(\)=\.:\s]/);
         lastNode = new _TEProperty.TEProperty(lastNode, name);
       } else if (/[0-9\.\-+]/.test(char)) {
         var value = this.readUntill(/\s/);
@@ -63,12 +67,28 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position++;
         lastNode = new _TEString.TEString(_value2);
       } else if (char == "(") {
-        this.position++;
+        if (lastNode) {
+          lastNode = new _TEMethodCall.TEMethodCall(lastNode);
+          this.position++;
+          this.skipWhitespace();
 
-        var _value3 = this.parseNormal(1);
+          while (this.text[this.position] != ')') {
+            if (this.position >= this.text.length) throw new Error('Unexpected end of input');
 
-        this.position++;
-        lastNode = _value3;
+            var _value3 = this.parseNormal(2);
+
+            lastNode.args.push(_value3);
+          }
+
+          this.position++;
+        } else {
+          this.position++;
+
+          var _value4 = this.parseNormal(1);
+
+          this.position++;
+          lastNode = _value4;
+        }
       } else if (char == ")") {
         if (endLevel >= 1) {
           break;
@@ -79,8 +99,14 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position += 2;
         var right = this.parseNormal(2);
         lastNode = new _TEEqual.TEEqual(lastNode, right);
+      } else if (char == ":") {
+        this.position++;
+
+        var _right = this.parseNormal(3);
+
+        lastNode = new _TEConcatenate.TEConcatenate(lastNode, _right);
       } else {
-        var _name = this.readUntill(/['"\(\)=\.\s]/);
+        var _name = this.readUntill(/['"\(\)=\.\s:]/);
 
         if (_name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (_name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(_name);
       }

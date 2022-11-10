@@ -26,7 +26,7 @@ class TElement extends _TNode.TNode {
     var ret = env.document.createElement(this.tagName);
 
     for (var attr of this.attributes) {
-      ret.setAttribute(attr.name, attr.expression.execute(env));
+      if (attr.expression) ret.setAttribute(attr.name, attr.expression.execute(env));else ret.setAttribute(attr.name, attr.name);
     }
 
     for (var child of this.children) {
@@ -42,7 +42,7 @@ class TElement extends _TNode.TNode {
     var code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
 
     for (var attr of this.attributes) {
-      code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";
+      if (attr.expression) code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";else code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + JSON.stringify(attr.name) + ");";
     }
 
     for (var child of this.children) {

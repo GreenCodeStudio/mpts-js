@@ -16,9 +16,9 @@ export class TEMethodCall extends TEExpression {
     }
 
     compileJS(scopedVariables = new Set()) {
-        let code=this.source.compileJS(scopedVariables);
+        let code=this.source.compileJS(scopedVariables).code;
         code+='(';
-        code+=this.args.map(x=>x.compileJS(scopedVariables)).join(',');
+        code+=this.args.map(x=>x.compileJS(scopedVariables).code).join(',');
         code+=')';
         return {code};
     }

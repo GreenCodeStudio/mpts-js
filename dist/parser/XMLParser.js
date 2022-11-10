@@ -131,7 +131,7 @@ class XMLParser extends _AbstractParser.AbstractParser {
       } else if (/\s/.test(_char)) {
         this.position++;
       } else {
-        var name = this.readUntill(/[\s=]/);
+        var name = this.readUntill(/[\s=/]/);
         var value = null;
         this.skipWhitespace();
         _char = this.text[this.position];

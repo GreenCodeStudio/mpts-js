@@ -18,6 +18,18 @@ class TEEqual extends _TEExpression.TEExpression {
     return this.left.execute(env) == this.right.execute(env);
   }
 
+  compileJS() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    var code = '(';
+    code += this.left.compileJS(scopedVariables).code;
+    code += '==';
+    code += this.right.compileJS(scopedVariables).code;
+    code += ')';
+    return {
+      code
+    };
+  }
+
 }
 
 exports.TEEqual = TEEqual;

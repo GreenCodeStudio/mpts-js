@@ -34,7 +34,8 @@ class TForeach extends _TNode.TNode {
         var envScoped = env.scope();
         if (this.item) envScoped.variables[this.item] = x;
         if (this.key) envScoped.variables[this.key] = i;
-        ret.appendChild(child.execute(envScoped));
+        var result = child.execute(envScoped);
+        if (result) ret.appendChild(result);
       }
 
       i++;

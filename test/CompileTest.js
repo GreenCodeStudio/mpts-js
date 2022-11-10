@@ -51,15 +51,45 @@ describe('Compile', () => {
         const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
-        let variables={a:  [1,2,3,4,5]};
+        let variables = {a: [1, 2, 3, 4, 5]};
         const result = eval(compiled.code + compiled.rootName);
         expect(result.textContent).to.be.equal("bbbbb");
+    })
+    it('if basic', async () => {
+        const obj = XMLParser.Parse("<:if condition=true>a</:if>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+
+        let variables = {};
+        const result1 = eval(compiled.code + compiled.rootName);
+        expect(result1.textContent).to.be.equal("a");
+    })
+    it('if basic2', async () => {
+        const obj = XMLParser.Parse("<:if condition=a>a</:if><:else-if condition=b>b</:else-if>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+
+        let variables = {a: false, b: true};
+        const result1 = eval(compiled.code + compiled.rootName);
+        expect(result1.textContent).to.be.equal("b");
+
+
+        variables = {a: true, b: true};
+        const result2 = eval(compiled.code + compiled.rootName);
+        expect(result2.textContent).to.be.equal("a");
+
+
+        variables = {a: false, b: false};
+        const result3 = eval(compiled.code + compiled.rootName);
+        expect(result3.textContent).to.be.equal("");
+
+
     })
     it('foreach advanced', async () => {
         const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
-        let variables={a:   ['a','b','c','d','e']};
+        let variables = {a: ['a', 'b', 'c', 'd', 'e']};
         const result = eval(compiled.code + compiled.rootName);
         expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
     })

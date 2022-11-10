@@ -8,6 +8,7 @@ import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall";
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
 const {TEBoolean} = require("../../src/nodes/expressions/TEBoolean");
+const {TEConcatenate} = require("../../src/nodes/expressions/TEConcatenate");
 
 describe('ExpressionTest', () => {
     describe('parse', () => {
@@ -85,6 +86,22 @@ describe('ExpressionTest', () => {
             expect(obj.source.name).to.be.equal("fun")
             expect(obj.args[0]).to.be.instanceOf(TEVariable)
             expect(obj.args[0].name).to.be.equal("x")
+        });
+        it('methodCallString', async () => {
+            const obj = ExpressionParser.Parse('fun("x")');
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("fun")
+            expect(obj.args[0]).to.be.instanceOf(TEString)
+            expect(obj.args[0].value).to.be.equal("x")
+        });
+        it('concatenation', async () => {
+            const obj = ExpressionParser.Parse('var1:var2');
+            expect(obj).to.be.instanceOf(TEConcatenate)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
         });
     });
 });

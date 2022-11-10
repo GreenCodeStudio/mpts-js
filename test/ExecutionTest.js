@@ -61,13 +61,13 @@ describe('Execution', () => {
         expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
     });
     it('element with attributes', async () => {
-        const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e)></div>");
+        const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e) f ></div>");
         const env = new Environment();
         env.document = document;
         env.variables.d = 4;
         env.variables.e = 5;
         const result = obj.execute(env);
-        expect(fragmentToHtml(result)).to.be.equal("<div a=\"1\" b=\"2\" c=\"3\" d=\"4\" e=\"5\"></div>");
+        expect(fragmentToHtml(result)).to.be.equal("<div a=\"1\" b=\"2\" c=\"3\" d=\"4\" e=\"5\" f=\"f\"></div>");
     });
     it('if else', async () => {
         const obj = XMLParser.Parse('<:if condition=(v==1)>a</:if><:else-if condition=(v==2)>b</:else-if><:else>c</:else>');

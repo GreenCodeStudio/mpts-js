@@ -51,11 +51,20 @@ describe('ExpressionTest', () => {
 
         it('equal', async () => {
             const obj = ExpressionParser.Parse('a==b');
-            expect(obj.compileJS().code).to.be.equal('variables[\"a\"]==variables[\"b\"]')
+            expect(obj.compileJS().code).to.be.equal('(variables[\"a\"]==variables[\"b\"])')
         });
         it('equal double', async () => {
             const obj = ExpressionParser.Parse('(a==b)==(c==d)');
-            expect(obj.compileJS().code).to.be.equal('(variables[\"a\"]==variables[\"b\"])==(variables[\"c\"]==variables[\"d\"])')
+            expect(obj.compileJS().code).to.be.equal('((variables[\"a\"]==variables[\"b\"])==(variables[\"c\"]==variables[\"d\"]))')
+        });
+        it('concat', async () => {
+            const obj = ExpressionParser.Parse('a:b');
+            expect(obj.compileJS().code).to.be.equal('(\'\'+variables[\"a\"]+variables[\"b\"])')
+        });
+
+        it('function call', async () => {
+            const obj = ExpressionParser.Parse('a("b")');
+            expect(obj.compileJS().code).to.be.equal('variables[\"a\"]("b")')
         });
     });
 });

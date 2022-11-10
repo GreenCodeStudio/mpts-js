@@ -106,7 +106,7 @@ export class XMLParser extends AbstractParser {
             } else if (/\s/.test(char)) {
                 this.position++;
             } else {
-                let name = this.readUntill(/[\s=]/);
+                let name = this.readUntill(/[\s=/]/);
                 let value = null;
                 this.skipWhitespace()
                 char = this.text[this.position];

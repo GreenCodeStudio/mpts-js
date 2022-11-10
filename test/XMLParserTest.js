@@ -89,6 +89,16 @@ describe('Parser', () => {
         expect(obj.children[0].attributes[1].expression.name).to.be.equal("v2");
     });
 
+    it('element with boolean atributes', async () => {
+        const obj = XMLParser.Parse("<textarea required/>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equals("textarea");
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[0].name).to.be.equals("required");
+        expect(obj.children[0].attributes[0].expression).to.be.equal(null);
+    });
+
     it('comment', async () => {
         const obj = XMLParser.Parse("<!--comment-->");
         expect(obj).to.be.instanceOf(TDocumentFragment);

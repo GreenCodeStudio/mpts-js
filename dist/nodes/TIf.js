@@ -47,11 +47,19 @@ class TIf extends _TNode.TNode {
 
   compileJS() {
     var rootName = (0, _utils.getUniqName)();
-    var code = 'let ' + rootName + ';'; // for (const condition of this.conditions) {
-    //     let childResult = child.compileJS();
-    //     code += childResult.code;
-    //     code += rootName + ".append(" + childResult.rootName + ");"
-    // }
+    var code = 'let ' + rootName + '=document.createDocumentFragment();';
+
+    for (var condition of this.conditions) {
+      code += (condition == this.conditions[0] ? 'if' : 'else if') + '(' + condition.expression.compileJS().code + '){';
+
+      for (var child of condition.children) {
+        var childResult = child.compileJS();
+        code += childResult.code;
+        code += rootName + ".append(" + childResult.rootName + ");";
+      }
+
+      code += '}';
+    }
 
     return {
       code,
