@@ -105,6 +105,14 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TComment);
         expect(obj.children[0].text).to.be.equals("comment");
     });
+    it('2 comments', async () => {
+        const obj = XMLParser.Parse("<!--comment1--><!--comment2-->");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TComment);
+        expect(obj.children[0].text).to.be.equals("comment1");
+        expect(obj.children[1]).to.be.instanceOf(TComment);
+        expect(obj.children[1].text).to.be.equals("comment2");
+    });
 
     it('if', async () => {
         const obj = XMLParser.Parse("<:if condition=false>text</:if><:else>text</:else>");

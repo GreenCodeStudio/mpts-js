@@ -15,6 +15,8 @@ class TLoop extends _TNode.TNode {
 
     _defineProperty(this, "children", []);
 
+    _defineProperty(this, "count", void 0);
+
     this.count = count;
   }
 

@@ -141,20 +141,14 @@ class XMLParser extends _AbstractParser.AbstractParser {
           this.skipWhitespace();
           var char2 = this.text[this.position];
 
-          if (char2 == '"') {
-            this.position++;
-            value = new _TEString.TEString(this.readUntill(/"/));
-            this.position++;
-          } else if (char2 == "'") {
-            this.position++;
-            value = new _TEString.TEString(this.readUntill(/'/));
-            this.position++;
-          } else if (char2 == "(") {
+          if (char2 == "(") {
             this.position++;
             value = _ExpressionParser.ExpressionParser.Parse(this.readUntill(/\)/));
             this.position++;
           } else {
-            value = _ExpressionParser.ExpressionParser.Parse(this.readUntill(/[\s>/]/));
+            var parser = new _ExpressionParser.ExpressionParser(this.text.substring(this.position));
+            value = parser.parseNormal();
+            this.position += parser.position;
           }
         }
 

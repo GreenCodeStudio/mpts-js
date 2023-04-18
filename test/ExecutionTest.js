@@ -88,6 +88,14 @@ describe('Execution', () => {
 
     });
 
+    it('realExample', async () => {
+        const obj = XMLParser.Parse('<:if condition=canAdd><a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a></:if>');
+        const env = new Environment();
+        env.document = document;
+        env.variables.canAdd = true;
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal('<a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a>');
+    })
     it('loop', async () => {
         const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
         const env = new Environment();

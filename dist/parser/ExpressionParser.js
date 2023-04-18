@@ -50,7 +50,7 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         var name = this.readUntill(/['"\(\)=\.:\s]/);
         lastNode = new _TEProperty.TEProperty(lastNode, name);
       } else if (/[0-9\.\-+]/.test(char)) {
-        var value = this.readUntill(/\s/);
+        var value = this.readUntill(/[^0-9\.\-+e]/);
         lastNode = new _TENumber.TENumber(+value);
       } else if (char == '"') {
         this.position++;
@@ -105,8 +105,18 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         var _right = this.parseNormal(3);
 
         lastNode = new _TEConcatenate.TEConcatenate(lastNode, _right);
+      } else if (char == ">" || char == "\\") {
+        if (lastNode) {
+          break;
+        } else {
+          throw new Error("Unexpected character");
+        }
       } else {
-        var _name = this.readUntill(/['"\(\)=\.\s:]/);
+        if (lastNode) {
+          break;
+        }
+
+        var _name = this.readUntill(/['"\(\)=\.\s:>/]/);
 
         if (_name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (_name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(_name);
       }

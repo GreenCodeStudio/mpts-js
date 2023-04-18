@@ -115,12 +115,14 @@ export class XMLParser extends AbstractParser {
                     this.skipWhitespace()
 
                     const char2 = this.text[this.position];
-                   if (char2 == "(") {
+                    if (char2 == "(") {
                         this.position++
                         value = ExpressionParser.Parse(this.readUntill(/\)/));
                         this.position++
                     } else {
-                        value = ExpressionParser.Parse(this.readUntill(/[\s>/]/));
+                        const parser = new ExpressionParser(this.text.substring(this.position));
+                        value = parser.parseNormal()
+                        this.position += parser.position;
                     }
                 }
                 element.attributes.push(new TAttribute(name, value))

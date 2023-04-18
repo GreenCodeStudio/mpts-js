@@ -2,6 +2,7 @@ import {TNode} from "./TNode";
 
 export class TLoop extends TNode {
     children = [];
+    count;
 
     constructor(count) {
         super();
