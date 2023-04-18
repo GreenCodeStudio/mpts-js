@@ -128,4 +128,13 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("");
     })
+
+    it('attribute concat', async () => {
+        const obj = XMLParser.Parse("<div ab=\"cd\":x:\"gh\"/>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.x = 'ef';
+        const result = obj.execute(env);
+        expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\"></div>");
+    });
 })

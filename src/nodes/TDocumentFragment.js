@@ -16,7 +16,7 @@ export class TDocumentFragment extends TNode{
         let rootName = getUniqName();
         let code = 'const ' + rootName + '=document.createDocumentFragment();';
         for (const child of this.children) {
-            let childResult = child.compileJS();
+            let childResult = child.compileJS(scopedVariables);
             code += childResult.code;
             code += rootName + ".append(" + childResult.rootName + ");"
         }

@@ -34,7 +34,7 @@ class TDocumentFragment extends _TNode.TNode {
     var code = 'const ' + rootName + '=document.createDocumentFragment();';
 
     for (var child of this.children) {
-      var childResult = child.compileJS();
+      var childResult = child.compileJS(scopedVariables);
       code += childResult.code;
       code += rootName + ".append(" + childResult.rootName + ");";
     }

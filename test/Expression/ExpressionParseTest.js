@@ -103,5 +103,13 @@ describe('ExpressionTest', () => {
             expect(obj.right).to.be.instanceOf(TEVariable)
             expect(obj.right.name).to.be.equal("var2")
         });
+        it('concatenation string', async () => {
+            const obj = ExpressionParser.Parse('"string1":var2');
+            expect(obj).to.be.instanceOf(TEConcatenate)
+            expect(obj.left).to.be.instanceOf(TEString)
+            expect(obj.left.value).to.be.equal("string1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
+        });
     });
 });

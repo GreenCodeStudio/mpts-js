@@ -45,15 +45,15 @@ class TIf extends _TNode.TNode {
     return ret;
   }
 
-  compileJS() {
+  compileJS(scopedVariables) {
     var rootName = (0, _utils.getUniqName)();
     var code = 'let ' + rootName + '=document.createDocumentFragment();';
 
     for (var condition of this.conditions) {
-      code += (condition == this.conditions[0] ? 'if' : 'else if') + '(' + condition.expression.compileJS().code + '){';
+      code += (condition == this.conditions[0] ? 'if' : 'else if') + '(' + condition.expression.compileJS(scopedVariables).code + '){';
 
       for (var child of condition.children) {
-        var childResult = child.compileJS();
+        var childResult = child.compileJS(scopedVariables);
         code += childResult.code;
         code += rootName + ".append(" + childResult.rootName + ");";
       }

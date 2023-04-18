@@ -86,11 +86,27 @@ describe('Compile', () => {
 
     })
     it('foreach advanced', async () => {
-        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
+        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div data-c=c>{{c}}:{{b}}</div></:foreach>");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
         let variables = {a: ['a', 'b', 'c', 'd', 'e']};
         const result = eval(compiled.code + compiled.rootName);
-        expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
+        expect(fragmentToHtml(result)).to.be.equal("<div data-c=\"0\">0:a</div><div data-c=\"1\">1:b</div><div data-c=\"2\">2:c</div><div data-c=\"3\">3:d</div><div data-c=\"4\">4:e</div>");
     })
+    it('foreach advanced2', async () => {
+        const obj = XMLParser.Parse("<:foreach collection=a item=b><:if condition=true>{{b.name}}</:if></:foreach>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables = {a: [{name: 'c'}, {name: 'd'}]};
+        const result = eval(compiled.code + compiled.rootName);
+        expect(fragmentToHtml(result)).to.be.equal("cd");
+    })
+    it('attribute concat', async () => {
+        const obj = XMLParser.Parse("<div ab=\"cd\":x:\"gh\"/>");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables = {x: 'ef'}
+        const result = eval(compiled.code + compiled.rootName);
+        expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\"></div>");
+    });
 })

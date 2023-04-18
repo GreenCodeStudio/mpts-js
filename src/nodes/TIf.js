@@ -28,14 +28,14 @@ export class TIf extends TNode {
         return ret;
     }
 
-    compileJS() {
+    compileJS(scopedVariables) {
         let rootName = getUniqName();
         let code = 'let ' + rootName + '=document.createDocumentFragment();';
         for (const condition of this.conditions) {
             code += ((condition == this.conditions[0]) ? 'if' : 'else if')
-                + '(' + condition.expression.compileJS().code + '){'
+                + '(' + condition.expression.compileJS(scopedVariables).code + '){'
             for (const child of condition.children) {
-                let childResult = child.compileJS();
+                let childResult = child.compileJS(scopedVariables);
                 code += childResult.code;
                 code += rootName + ".append(" + childResult.rootName + ");"
             }
