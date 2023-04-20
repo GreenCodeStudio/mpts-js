@@ -8,6 +8,8 @@ import {AbstractParser} from "./AbstractParser";
 import {TEProperty} from "../nodes/expressions/TEProperty";
 import {TEMethodCall} from "../nodes/expressions/TEMethodCall";
 import {TEConcatenate} from "../nodes/expressions/TEConcatenate";
+import {TEAdd} from "../nodes/expressions/TEAdd";
+import {TESubtract} from "../nodes/expressions/TESubtract";
 
 export class ExpressionParser extends AbstractParser {
     constructor(text) {
@@ -28,10 +30,11 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
             } else if (lastNode && char == '.') {
                 this.position++;
-                let name = this.readUntill(/['"\(\)=\.:\s]/);
+                let name = this.readUntill(/['"\(\)=\.:\s>]/);
                 lastNode = new TEProperty(lastNode, name);
-            } else if (/[0-9\.\-+]/.test(char)) {
-                let value = this.readUntill(/[^0-9\.\-+e]/);
+            } else if (/[0-9\.]/.test(char)) {
+                this.position++;
+                let value = char+this.readUntill(/[^0-9\.e]/);
                 lastNode = new TENumber(+value);
             } else if (char == '"') {
                 this.position++;
@@ -71,6 +74,20 @@ export class ExpressionParser extends AbstractParser {
                 this.position += 2;
                 let right = this.parseNormal(2);
                 lastNode = new TEEqual(lastNode, right);
+            } else if (char == "+") {
+                if (endLevel >= 4) {
+                    break;
+                }
+                this.position++;
+                let right = this.parseNormal(4);
+                lastNode = new TEAdd(lastNode, right);
+            } else if (char == "-") {
+                if (endLevel >= 4) {
+                    break;
+                }
+                this.position++;
+                let right = this.parseNormal(4);
+                lastNode = new TESubtract(lastNode, right);
             } else if (char == ":") {
                 this.position++;
                 let right = this.parseNormal(3);

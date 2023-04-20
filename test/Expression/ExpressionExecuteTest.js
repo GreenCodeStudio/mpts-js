@@ -89,5 +89,16 @@ describe('ExpressionTest', () => {
             env.variables.fun = z=>z*10;
             expect(obj.execute(env)).to.be.equal(10)
         });
+
+        it('add', async () => {
+            const obj = ExpressionParser.Parse('2+5 + 3');
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(10)
+        });
+        it('sub', async () => {
+            const obj = ExpressionParser.Parse('2-5 - 3');
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(-6)
+        });
     });
 });

@@ -156,4 +156,13 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].children[0]).to.be.instanceOf(TForeach);
     });
+
+    it('comment after element', async () => {
+        const obj = XMLParser.Parse("<tr data-amount=article.amount><!--comment--></tr>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].children[0]).to.be.instanceOf(TComment);
+    });
+
+
 })
