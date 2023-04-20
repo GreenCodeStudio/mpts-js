@@ -25,6 +25,12 @@ var _TEMethodCall = require("../nodes/expressions/TEMethodCall");
 
 var _TEConcatenate = require("../nodes/expressions/TEConcatenate");
 
+var _TEAdd = require("../nodes/expressions/TEAdd");
+
+var _TESubtract = require("../nodes/expressions/TESubtract");
+
+var _TEOrNull = require("../nodes/expressions/TEOrNull");
+
 class ExpressionParser extends _AbstractParser.AbstractParser {
   constructor(text) {
     super();
@@ -47,10 +53,11 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position++;
       } else if (lastNode && char == '.') {
         this.position++;
-        var name = this.readUntill(/['"\(\)=\.:\s]/);
+        var name = this.readUntill(/['"\(\)=\.:\s>+\-*?]/);
         lastNode = new _TEProperty.TEProperty(lastNode, name);
-      } else if (/[0-9\.\-+]/.test(char)) {
-        var value = this.readUntill(/[^0-9\.\-+e]/);
+      } else if (/[0-9\.]/.test(char)) {
+        this.position++;
+        var value = char + this.readUntill(/[^0-9\.e]/);
         lastNode = new _TENumber.TENumber(+value);
       } else if (char == '"') {
         this.position++;
@@ -99,12 +106,42 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position += 2;
         var right = this.parseNormal(2);
         lastNode = new _TEEqual.TEEqual(lastNode, right);
+      } else if (char == "?" && this.text[this.position + 1] == "?") {
+        if (endLevel >= 5) {
+          break;
+        }
+
+        this.position += 2;
+
+        var _right = this.parseNormal(5);
+
+        lastNode = new _TEOrNull.TEOrNull(lastNode, _right);
+      } else if (char == "+") {
+        if (endLevel >= 4) {
+          break;
+        }
+
+        this.position++;
+
+        var _right2 = this.parseNormal(4);
+
+        lastNode = new _TEAdd.TEAdd(lastNode, _right2);
+      } else if (char == "-") {
+        if (endLevel >= 4) {
+          break;
+        }
+
+        this.position++;
+
+        var _right3 = this.parseNormal(4);
+
+        lastNode = new _TESubtract.TESubtract(lastNode, _right3);
       } else if (char == ":") {
         this.position++;
 
-        var _right = this.parseNormal(3);
+        var _right4 = this.parseNormal(3);
 
-        lastNode = new _TEConcatenate.TEConcatenate(lastNode, _right);
+        lastNode = new _TEConcatenate.TEConcatenate(lastNode, _right4);
       } else if (char == ">" || char == "\\") {
         if (lastNode) {
           break;
@@ -116,7 +153,7 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
           break;
         }
 
-        var _name = this.readUntill(/['"\(\)=\.\s:>/]/);
+        var _name = this.readUntill(/['"\(\)=\.\s:>/+\-*?]/);
 
         if (_name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (_name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(_name);
       }

@@ -100,5 +100,27 @@ describe('ExpressionTest', () => {
             const env = new Environment();
             expect(obj.execute(env)).to.be.equal(-6)
         });
+
+
+        it('orNull', async () => {
+            const obj = ExpressionParser.Parse('var1??"empty"');
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal("empty")
+            env.variables.var1 = null;
+            expect(obj.execute(env)).to.be.equal("empty")
+            env.variables.var1 = "val";
+            expect(obj.execute(env)).to.be.equal("val")
+        });
+        it('orNullProperty', async () => {
+            const obj = ExpressionParser.Parse('var1.property??"empty"');
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal("empty")
+            env.variables.var1 = null;
+            expect(obj.execute(env)).to.be.equal("empty")
+            env.variables.var1 = {};
+            expect(obj.execute(env)).to.be.equal("empty")
+            env.variables.var1 = {property:'val'};
+            expect(obj.execute(env)).to.be.equal("val")
+        });
     });
 });

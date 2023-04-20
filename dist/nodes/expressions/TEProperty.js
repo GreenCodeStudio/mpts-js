@@ -25,7 +25,11 @@ class TEProperty extends _TEExpression.TEExpression {
   }
 
   execute(env) {
-    return this.source.execute(env)[this.name];
+    var _parent;
+
+    var parent = this.source.execute(env);
+    if (env.allowUndefined) parent = (_parent = parent) !== null && _parent !== void 0 ? _parent : {};
+    return parent[this.name];
   }
 
   compileJS() {

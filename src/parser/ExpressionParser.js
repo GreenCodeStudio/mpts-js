@@ -10,6 +10,7 @@ import {TEMethodCall} from "../nodes/expressions/TEMethodCall";
 import {TEConcatenate} from "../nodes/expressions/TEConcatenate";
 import {TEAdd} from "../nodes/expressions/TEAdd";
 import {TESubtract} from "../nodes/expressions/TESubtract";
+import {TEOrNull} from "../nodes/expressions/TEOrNull";
 
 export class ExpressionParser extends AbstractParser {
     constructor(text) {
@@ -30,7 +31,7 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
             } else if (lastNode && char == '.') {
                 this.position++;
-                let name = this.readUntill(/['"\(\)=\.:\s>]/);
+                let name = this.readUntill(/['"\(\)=\.:\s>+\-*?]/);
                 lastNode = new TEProperty(lastNode, name);
             } else if (/[0-9\.]/.test(char)) {
                 this.position++;
@@ -74,7 +75,14 @@ export class ExpressionParser extends AbstractParser {
                 this.position += 2;
                 let right = this.parseNormal(2);
                 lastNode = new TEEqual(lastNode, right);
-            } else if (char == "+") {
+            }  else if (char == "?"&& this.text[this.position + 1] == "?") {
+                if (endLevel >= 5) {
+                    break;
+                }
+                this.position+=2;
+                let right = this.parseNormal(5);
+                lastNode = new TEOrNull(lastNode, right);
+            }else if (char == "+") {
                 if (endLevel >= 4) {
                     break;
                 }
@@ -102,7 +110,7 @@ export class ExpressionParser extends AbstractParser {
                 if (lastNode) {
                     break;
                 }
-                let name = this.readUntill(/['"\(\)=\.\s:>/]/);
+                let name = this.readUntill(/['"\(\)=\.\s:>/+\-*?]/);
                 if (name == 'true')
                     lastNode = new TEBoolean(true)
                 else if (name == 'false')

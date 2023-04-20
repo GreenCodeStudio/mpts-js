@@ -12,10 +12,13 @@ export class TEProperty extends TEExpression {
     }
 
     execute(env) {
-        return this.source.execute(env)[this.name];
+        let parent = this.source.execute(env);
+        if (env.allowUndefined)
+            parent = parent ?? {}
+        return parent[this.name];
     }
 
-    compileJS(scopedVariables=new Set()) {
+    compileJS(scopedVariables = new Set()) {
         let code = this.source.compileJS(scopedVariables).code + '[' + JSON.stringify(this.name) + ']';
         return {code};
     }

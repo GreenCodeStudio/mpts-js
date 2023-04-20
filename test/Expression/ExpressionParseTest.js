@@ -4,6 +4,7 @@ import {TENumber} from "../../src/nodes/expressions/TENumber";
 import {TEEqual} from "../../src/nodes/expressions/TEEqual";
 import {TEProperty} from "../../src/nodes/expressions/TEProperty";
 import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall";
+import {TEOrNull} from "../../src/nodes/expressions/TEOrNull";
 
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
@@ -110,6 +111,24 @@ describe('ExpressionTest', () => {
             expect(obj.left.value).to.be.equal("string1")
             expect(obj.right).to.be.instanceOf(TEVariable)
             expect(obj.right.name).to.be.equal("var2")
+        });
+        it('orNull', async () => {
+            const obj = ExpressionParser.Parse('var1??"empty"');
+            expect(obj).to.be.instanceOf(TEOrNull)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
+        });
+        it('orNullProperty', async () => {
+            const obj = ExpressionParser.Parse('var1.property??"empty"');
+            expect(obj).to.be.instanceOf(TEOrNull)
+            expect(obj.left).to.be.instanceOf(TEProperty)
+            expect(obj.left.name).to.be.equal("property")
+            expect(obj.left.source).to.be.instanceOf(TEVariable)
+            expect(obj.left.source.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
         });
     });
 });
