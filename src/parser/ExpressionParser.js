@@ -19,8 +19,8 @@ export class ExpressionParser extends AbstractParser {
         this.position = 0;
     }
 
-    static Parse(text) {
-        return (new ExpressionParser(text)).parseNormal();
+    static Parse(text, endLevel=0) {
+        return (new ExpressionParser(text)).parseNormal(endLevel);
     }
 
     parseNormal(endLevel = 0) {

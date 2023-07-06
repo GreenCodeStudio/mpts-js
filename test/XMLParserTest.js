@@ -13,6 +13,9 @@ const {TLoop} = require("../src/nodes/TLoop");
 const {TComment} = require("../src/nodes/TComment");
 const {TForeach} = require("../src/nodes/TForeach");
 const {MptsParserError} = require("../src/parser/MptsParserError");
+const {TEOrNull} = require("../src/nodes/expressions/TEOrNull");
+const {TEProperty} = require("../src/nodes/expressions/TEProperty");
+const {TEMethodCall} = require("../src/nodes/expressions/TEMethodCall");
 
 describe('Parser', () => {
     it('basic text', async () => {
@@ -75,7 +78,7 @@ describe('Parser', () => {
     });
 
     it('element with attributes with variables', async () => {
-        const obj = XMLParser.Parse("<img src=(v1) alt=v2/>");
+        const obj = XMLParser.Parse("<img src=(v1) alt=v2 class=(getClass())/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("img");
@@ -87,6 +90,11 @@ describe('Parser', () => {
         expect(obj.children[0].attributes[1].name).to.be.equals("alt");
         expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEVariable);
         expect(obj.children[0].attributes[1].expression.name).to.be.equal("v2");
+        expect(obj.children[0].attributes[2]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[2].name).to.be.equals("class");
+        expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEMethodCall);
+        expect(obj.children[0].attributes[2].expression.source).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].attributes[2].expression.source.name).to.be.equal("getClass");
     });
 
     it('element with boolean atributes', async () => {
@@ -163,6 +171,32 @@ describe('Parser', () => {
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].children[0]).to.be.instanceOf(TComment);
     });
+describe('cases from real life', () => {
+    it('1', async () => {
+        const obj = XMLParser.Parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[0].name).to.be.equals("name");
+        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
+        expect(obj.children[0].attributes[0].expression.value).to.be.equal("realizationTime");
+        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[1].name).to.be.equals("type");
+        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
+        expect(obj.children[0].attributes[1].expression.value).to.be.equal("number");
+        expect(obj.children[0].attributes[2]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[2].name).to.be.equals("step");
+        expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEString);
+        expect(obj.children[0].attributes[2].expression.value).to.be.equal("0.01");
+        expect(obj.children[0].attributes[3]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[3].name).to.be.equals("value");
+        expect(obj.children[0].attributes[3].expression).to.be.instanceOf(TEOrNull);
+        expect(obj.children[0].attributes[3].expression.left).to.be.instanceOf(TEProperty);
+        expect(obj.children[0].attributes[3].expression.left.source).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].attributes[3].expression.right).to.be.instanceOf(TEMethodCall);
+        expect(obj.children[0].attributes[3].expression.right.source).to.be.instanceOf(TEVariable);
 
+    });
+});
 
 })
