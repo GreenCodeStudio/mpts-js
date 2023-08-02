@@ -26,7 +26,10 @@ class TElement extends _TNode.TNode {
     var ret = env.document.createElement(this.tagName);
 
     for (var attr of this.attributes) {
-      if (attr.expression) ret.setAttribute(attr.name, attr.expression.execute(env));else ret.setAttribute(attr.name, attr.name);
+      if (attr.expression) {
+        var value = attr.expression.execute(env);
+        if (typeof value === 'function') ret[attr.name] = value;else ret.setAttribute(attr.name, attr.expression.execute(env));
+      } else ret.setAttribute(attr.name, attr.name);
     }
 
     for (var child of this.children) {
@@ -42,7 +45,11 @@ class TElement extends _TNode.TNode {
     var code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
 
     for (var attr of this.attributes) {
-      if (attr.expression) code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";else code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + JSON.stringify(attr.name) + ");";
+      if (attr.expression) {
+        var attrValueName = (0, _utils.getUniqName)();
+        code += 'const ' + attrValueName + '=' + attr.expression.compileJS(scopedVariables).code + ';';
+        code += "if(typeof ".concat(attrValueName, "==='function')").concat(rootName, "[").concat(JSON.stringify(attr.name), "]=").concat(attrValueName, ";else ").concat(rootName, ".setAttribute(").concat(JSON.stringify(attr.name), ",").concat(attrValueName, ");");
+      } else code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + JSON.stringify(attr.name) + ");";
     }
 
     for (var child of this.children) {

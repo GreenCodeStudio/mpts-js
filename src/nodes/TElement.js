@@ -30,7 +30,7 @@ export class TElement extends TNode {
         for (const attr of this.attributes) {
             if (attr.expression) {
                 let attrValueName = getUniqName();
-                code+=attrValueName+'='+attr.expression.compileJS(scopedVariables).code+';';
+                code+='const '+attrValueName+'='+attr.expression.compileJS(scopedVariables).code+';';
                 code+=`if(typeof ${attrValueName}==='function')${rootName}[${JSON.stringify(attr.name)}]=${attrValueName};else ${rootName}.setAttribute(${JSON.stringify(attr.name)},${attrValueName});`;
             }
             else
