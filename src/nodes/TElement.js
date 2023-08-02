@@ -9,9 +9,13 @@ export class TElement extends TNode {
     execute(env) {
         let ret = env.document.createElement(this.tagName);
         for (const attr of this.attributes) {
-            if (attr.expression)
-                ret.setAttribute(attr.name, attr.expression.execute(env));
-            else
+            if (attr.expression) {
+                let value = attr.expression.execute(env);
+                if (typeof value === 'function')
+                    ret[attr.name] = value;
+                else
+                    ret.setAttribute(attr.name, attr.expression.execute(env));
+            } else
                 ret.setAttribute(attr.name, attr.name);
         }
         for (const child of this.children) {
@@ -24,8 +28,11 @@ export class TElement extends TNode {
         let rootName = getUniqName();
         let code = 'const ' + rootName + '=document.createElement(' + JSON.stringify(this.tagName) + ');';
         for (const attr of this.attributes) {
-            if (attr.expression)
-                code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + attr.expression.compileJS(scopedVariables).code + ");";
+            if (attr.expression) {
+                let attrValueName = getUniqName();
+                code+=attrValueName+'='+attr.expression.compileJS(scopedVariables).code+';';
+                code+=`if(typeof ${attrValueName}==='function')${rootName}[${JSON.stringify(attr.name)}]=${attrValueName};else ${rootName}.setAttribute(${JSON.stringify(attr.name)},${attrValueName});`;
+            }
             else
                 code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + JSON.stringify(attr.name) + ");";
         }

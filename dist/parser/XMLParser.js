@@ -140,16 +140,9 @@ class XMLParser extends _AbstractParser.AbstractParser {
           this.position++;
           this.skipWhitespace();
           var char2 = this.text[this.position];
-
-          if (char2 == "(") {
-            this.position++;
-            value = _ExpressionParser.ExpressionParser.Parse(this.readUntill(/\)/));
-            this.position++;
-          } else {
-            var parser = new _ExpressionParser.ExpressionParser(this.text.substring(this.position));
-            value = parser.parseNormal();
-            this.position += parser.position;
-          }
+          var parser = new _ExpressionParser.ExpressionParser(this.text.substring(this.position));
+          value = parser.parseNormal();
+          this.position += parser.position;
         }
 
         element.attributes.push(new _TAttribute.TAttribute(name, value));

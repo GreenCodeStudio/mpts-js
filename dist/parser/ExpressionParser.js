@@ -39,7 +39,8 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
   }
 
   static Parse(text) {
-    return new ExpressionParser(text).parseNormal();
+    var endLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    return new ExpressionParser(text).parseNormal(endLevel);
   }
 
   parseNormal() {
