@@ -16,187 +16,49 @@ const {MptsParserError} = require("../src/parser/MptsParserError");
 const {TEOrNull} = require("../src/nodes/expressions/TEOrNull");
 const {TEProperty} = require("../src/nodes/expressions/TEProperty");
 const {TEMethodCall} = require("../src/nodes/expressions/TEMethodCall");
+const {UniParserTest} = require("./UniParserTest");
 
-describe('Parser', () => {
-    it('basic text', async () => {
-        const obj = XMLParser.Parse("Hello, world!");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].text).to.be.equals("Hello, world!");
-    });
+describe('XMLParser', () => {
+    UniParserTest(XMLParser);
 
-    it('basic element', async () => {
-        const obj = XMLParser.Parse("<br/>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("br");
-    });
-    it('basic element2', async () => {
-        const obj = XMLParser.Parse("<div></div>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("div");
-    });
+
     it('not closed element', async () => {
         expect(()=>XMLParser.Parse("<div>")).to.throw(MptsParserError);
         expect(()=>XMLParser.Parse("<div>")).to.throw(/Element <div> not closed/);
         expect(()=>XMLParser.Parse("<div>")).to.throw(/1:5/);
     });
-    it('not opened element', async () => {
-        expect(()=>XMLParser.Parse("</div>")).to.throw(MptsParserError);
-        expect(()=>XMLParser.Parse("</div>")).to.throw(/Last opened element is not <div>/);
-        expect(()=>XMLParser.Parse("</div>")).to.throw(/1:0/);
-    });
-    it('elementsinside', async () => {
-        const obj = XMLParser.Parse("<div><p><strong></strong><span></span></p></div>");
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("div");
-        expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].children[0].tagName).to.be.equals("p");
-        expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].children[0].children[0].tagName).to.be.equals("strong");
-        expect(obj.children[0].children[0].children[1]).to.be.instanceOf(TElement);
-        expect(obj.children[0].children[0].children[1].tagName).to.be.equals("span");
-    });
+
     it('bad order of close', async () => {
         expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
         expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <span>/);
     });
-    it('element with attributes', async () => {
-        const obj = XMLParser.Parse("<img src=\"a.png\" alt='a'/>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("img");
-        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[0].name).to.be.equals("src");
-        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
-        expect(obj.children[0].attributes[0].expression.value).to.be.equal("a.png");
-        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[1].name).to.be.equals("alt");
-        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
-        expect(obj.children[0].attributes[1].expression.value).to.be.equal("a");
-    });
 
-    it('element with attributes with variables', async () => {
-        const obj = XMLParser.Parse("<img src=(v1) alt=v2 class=(getClass())/>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("img");
-        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[0].name).to.be.equals("src");
-        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].attributes[0].expression.name).to.be.equal("v1");
-        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[1].name).to.be.equals("alt");
-        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].attributes[1].expression.name).to.be.equal("v2");
-        expect(obj.children[0].attributes[2]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[2].name).to.be.equals("class");
-        expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEMethodCall);
-        expect(obj.children[0].attributes[2].expression.source).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].attributes[2].expression.source.name).to.be.equal("getClass");
-    });
+    describe('cases from real life', () => {
+        it('1', async () => {
+            const obj = XMLParser.Parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+            expect(obj.children[0].attributes[0].name).to.be.equals("name");
+            expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
+            expect(obj.children[0].attributes[0].expression.value).to.be.equal("realizationTime");
+            expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
+            expect(obj.children[0].attributes[1].name).to.be.equals("type");
+            expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
+            expect(obj.children[0].attributes[1].expression.value).to.be.equal("number");
+            expect(obj.children[0].attributes[2]).to.be.instanceOf(TAttribute);
+            expect(obj.children[0].attributes[2].name).to.be.equals("step");
+            expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEString);
+            expect(obj.children[0].attributes[2].expression.value).to.be.equal("0.01");
+            expect(obj.children[0].attributes[3]).to.be.instanceOf(TAttribute);
+            expect(obj.children[0].attributes[3].name).to.be.equals("value");
+            expect(obj.children[0].attributes[3].expression).to.be.instanceOf(TEOrNull);
+            expect(obj.children[0].attributes[3].expression.left).to.be.instanceOf(TEProperty);
+            expect(obj.children[0].attributes[3].expression.left.source).to.be.instanceOf(TEVariable);
+            expect(obj.children[0].attributes[3].expression.right).to.be.instanceOf(TEMethodCall);
+            expect(obj.children[0].attributes[3].expression.right.source).to.be.instanceOf(TEVariable);
 
-    it('element with boolean atributes', async () => {
-        const obj = XMLParser.Parse("<textarea required/>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].tagName).to.be.equals("textarea");
-        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[0].name).to.be.equals("required");
-        expect(obj.children[0].attributes[0].expression).to.be.equal(null);
+        });
     });
-
-    it('comment', async () => {
-        const obj = XMLParser.Parse("<!--comment-->");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TComment);
-        expect(obj.children[0].text).to.be.equals("comment");
-    });
-    it('2 comments', async () => {
-        const obj = XMLParser.Parse("<!--comment1--><!--comment2-->");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TComment);
-        expect(obj.children[0].text).to.be.equals("comment1");
-        expect(obj.children[1]).to.be.instanceOf(TComment);
-        expect(obj.children[1].text).to.be.equals("comment2");
-    });
-
-    it('if', async () => {
-        const obj = XMLParser.Parse("<:if condition=false>text</:if><:else>text</:else>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TIf);
-        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
-        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
-    });
-    it('loop', async () => {
-        const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TLoop);
-        expect(obj.children[0].count).to.be.instanceOf(TENumber);
-        expect(obj.children[0].count.value).to.be.equal(10);
-        expect(obj.children[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].children[0].text).to.be.equal('b');
-    })
-    it('foreach basic', async () => {
-        const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TForeach);
-        expect(obj.children[0].collection).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].collection.name).to.be.equal('a');
-        expect(obj.children[0].children[0]).to.be.instanceOf(TText);
-        expect(obj.children[0].children[0].text).to.be.equal('b');
-    });
-    it('foreach advanced', async () => {
-        const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TForeach);
-        expect(obj.children[0].collection).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].collection.name).to.be.equal('a');
-        expect(obj.children[0].item).to.be.equal('b');
-        expect(obj.children[0].key).to.be.equal('c');
-        expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
-    });
-    it('foreach inside element', async () => {
-        const obj = XMLParser.Parse("<select><:foreach collection=a>b</:foreach></select>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].children[0]).to.be.instanceOf(TForeach);
-    });
-
-    it('comment after element', async () => {
-        const obj = XMLParser.Parse("<tr data-amount=article.amount><!--comment--></tr>");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].children[0]).to.be.instanceOf(TComment);
-    });
-describe('cases from real life', () => {
-    it('1', async () => {
-        const obj = XMLParser.Parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
-        expect(obj).to.be.instanceOf(TDocumentFragment);
-        expect(obj.children[0]).to.be.instanceOf(TElement);
-        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[0].name).to.be.equals("name");
-        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
-        expect(obj.children[0].attributes[0].expression.value).to.be.equal("realizationTime");
-        expect(obj.children[0].attributes[1]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[1].name).to.be.equals("type");
-        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEString);
-        expect(obj.children[0].attributes[1].expression.value).to.be.equal("number");
-        expect(obj.children[0].attributes[2]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[2].name).to.be.equals("step");
-        expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEString);
-        expect(obj.children[0].attributes[2].expression.value).to.be.equal("0.01");
-        expect(obj.children[0].attributes[3]).to.be.instanceOf(TAttribute);
-        expect(obj.children[0].attributes[3].name).to.be.equals("value");
-        expect(obj.children[0].attributes[3].expression).to.be.instanceOf(TEOrNull);
-        expect(obj.children[0].attributes[3].expression.left).to.be.instanceOf(TEProperty);
-        expect(obj.children[0].attributes[3].expression.left.source).to.be.instanceOf(TEVariable);
-        expect(obj.children[0].attributes[3].expression.right).to.be.instanceOf(TEMethodCall);
-        expect(obj.children[0].attributes[3].expression.right.source).to.be.instanceOf(TEVariable);
-
-    });
-});
 
 })
