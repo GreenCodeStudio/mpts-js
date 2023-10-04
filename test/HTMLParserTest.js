@@ -61,7 +61,7 @@ describe('HTMLParser', () => {
             const obj = HTMLParser.Parse("<div><br><section>");
             expect(obj).to.be.instanceOf(TDocumentFragment);
             expect(obj.children[0]).to.be.instanceOf(TElement);
-            expect(obj.children[0].tagName).to.be.equals("p");
+            expect(obj.children[0].tagName).to.be.equals("div");
             expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
             expect(obj.children[0].children[0].tagName).to.be.equals("br");
             expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
