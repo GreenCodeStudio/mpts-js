@@ -22,4 +22,7 @@ export class TDocumentFragment extends TNode{
         }
         return {code, rootName};
     }
+    compileJSVue(scopedVariables = new Set()) {
+        return `[${this.children.map(x=>x.compileJSVue(scopedVariables)).join(',')}]`;
+    }
 }

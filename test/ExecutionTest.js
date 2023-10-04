@@ -37,6 +37,15 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("<div></div>");
     });
+    it('encoded html from variable', async () => {
+        const obj = XMLParser.Parse("<<element>>");
+        const env = new Environment();
+        env.document = document;
+        env.variables.element = "<div>text</div>";
+        const result = obj.execute(env);
+        expect(result.tagName).to.be.equal("div");
+        expect(result.textContent).to.be.equal("<div></div>");
+    });
     it('basic element', async () => {
         const obj = XMLParser.Parse("<br/>");
         const env = new Environment();
