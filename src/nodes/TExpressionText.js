@@ -15,4 +15,7 @@ export class TExpressionText extends TNode{
         let code = 'const ' + rootName + '=document.createTextNode(' + this.expression.compileJS(scopedVariables).code + ');';
         return {code, rootName};
     }
+    compileJSVue(scopedVariables = new Set()) {
+        return this.expression.compileJS(scopedVariables).code;
+    }
 }

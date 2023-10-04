@@ -45,6 +45,11 @@ class TDocumentFragment extends _TNode.TNode {
     };
   }
 
+  compileJSVue() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    return "[".concat(this.children.map(x => x.compileJSVue(scopedVariables)).join(','), "]");
+  }
+
 }
 
 exports.TDocumentFragment = TDocumentFragment;

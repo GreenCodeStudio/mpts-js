@@ -38,6 +38,11 @@ class TExpressionText extends _TNode.TNode {
     };
   }
 
+  compileJSVue() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    return this.expression.compileJS(scopedVariables).code;
+  }
+
 }
 
 exports.TExpressionText = TExpressionText;

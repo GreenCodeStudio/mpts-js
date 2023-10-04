@@ -53,6 +53,6 @@ export class TElement extends TNode {
                 return JSON.stringify(attr.name)+ ':'+JSON.stringify(attr.name)
             }
         });
-       return 'h(' + JSON.stringify(this.tagName) + ',{'+attributes.join(',')+'});';
+       return 'h(' + JSON.stringify(this.tagName) + ',{'+attributes.join(',')+'},['+this.children.map(c=>c.compileJSVue(scopedVariables))+'])';
     }
 }

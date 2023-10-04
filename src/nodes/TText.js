@@ -14,4 +14,8 @@ export class TText extends TNode{
         let code = 'const ' + rootName + '=document.createTextNode(' + JSON.stringify(he.decode(this.text)) + ');';
         return {code, rootName};
     }
+
+    compileJSVue(scopedVariables = new Set()) {
+        return JSON.stringify(this.text);
+    }
 }

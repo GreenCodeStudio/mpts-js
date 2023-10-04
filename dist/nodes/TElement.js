@@ -64,6 +64,18 @@ class TElement extends _TNode.TNode {
     };
   }
 
+  compileJSVue() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    var attributes = this.attributes.map(attr => {
+      if (attr.expression) {
+        return JSON.stringify(attr.name) + ':' + attr.expression.compileJS(scopedVariables).code;
+      } else {
+        return JSON.stringify(attr.name) + ':' + JSON.stringify(attr.name);
+      }
+    });
+    return 'h(' + JSON.stringify(this.tagName) + ',{' + attributes.join(',') + '},[' + this.children.map(c => c.compileJSVue(scopedVariables)) + '])';
+  }
+
 }
 
 exports.TElement = TElement;

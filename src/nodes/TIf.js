@@ -48,4 +48,11 @@ export class TIf extends TNode {
         if (this.else) return this.else.children
         else return this.conditions[this.conditions.length - 1].children;
     }
+    compileJSVue(scopedVariables = new Set()) {
+        let code=this.else?.compileJSVue(scopedVariables).code;
+        for(let condition of [...this.conditions].reverse()){
+            code=`(${condition.expression.compileJS(scopedVariables).code} ? ([${condition.children.map(c=>c.compileJSVue(scopedVariables)).join(',')}]) : ${code})`;
+        }
+        return code;
+    }
 }

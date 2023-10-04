@@ -35,6 +35,11 @@ class TText extends _TNode.TNode {
     };
   }
 
+  compileJSVue() {
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    return JSON.stringify(this.text);
+  }
+
 }
 
 exports.TText = TText;

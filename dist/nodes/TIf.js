@@ -71,6 +71,19 @@ class TIf extends _TNode.TNode {
     if (this.else) return this.else.children;else return this.conditions[this.conditions.length - 1].children;
   }
 
+  compileJSVue() {
+    var _this$else;
+
+    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
+    var code = (_this$else = this.else) === null || _this$else === void 0 ? void 0 : _this$else.compileJSVue(scopedVariables).code;
+
+    for (var condition of [...this.conditions].reverse()) {
+      code = "(".concat(condition.expression.compileJS(scopedVariables).code, " ? ([").concat(condition.children.map(c => c.compileJSVue(scopedVariables)).join(','), "]) : ").concat(code, ")");
+    }
+
+    return code;
+  }
+
 }
 
 exports.TIf = TIf;
