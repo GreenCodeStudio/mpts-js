@@ -82,12 +82,20 @@ describe('ExpressionTest', () => {
             env.variables.d = 4;
             expect(obj.execute(env)).to.be.equal(true)
         });
-        it('medhod call', async () => {
+        it('method call', async () => {
             const obj = ExpressionParser.Parse('fun(x)');
             const env = new Environment();
             env.variables.x = 1;
             env.variables.fun = z=>z*10;
             expect(obj.execute(env)).to.be.equal(10)
+        });
+        it('method call mutliple', async () => {
+            const obj = ExpressionParser.Parse('fun(first,second)');
+            const env = new Environment();
+            env.variables.first = 3;
+            env.variables.second = 7;
+            env.variables.fun = (a,b)=>a*b;
+            expect(obj.execute(env)).to.be.equal(21)
         });
 
         it('add', async () => {

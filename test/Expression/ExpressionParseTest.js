@@ -88,6 +88,18 @@ describe('ExpressionTest', () => {
             expect(obj.args[0]).to.be.instanceOf(TEVariable)
             expect(obj.args[0].name).to.be.equal("x")
         });
+        it('methodCallMultiArgument', async () => {
+            const obj = ExpressionParser.Parse('fun(x,y,z)');
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("fun")
+            expect(obj.args[0]).to.be.instanceOf(TEVariable)
+            expect(obj.args[0].name).to.be.equal("x")
+            expect(obj.args[1]).to.be.instanceOf(TEVariable)
+            expect(obj.args[1].name).to.be.equal("y")
+            expect(obj.args[2]).to.be.instanceOf(TEVariable)
+            expect(obj.args[2].name).to.be.equal("z")
+        });
         it('methodCallString', async () => {
             const obj = ExpressionParser.Parse('fun("x")');
             expect(obj).to.be.instanceOf(TEMethodCall)
