@@ -12,6 +12,7 @@ import {TLoop} from "../nodes/TLoop";
 import {TComment} from "../nodes/TComment";
 import {TForeach} from "../nodes/TForeach";
 import {MptsParserError} from "./MptsParserError";
+import {TExpressionSubnode} from "../nodes/TExpressionSubnode";
 
 export class AbstractMLParser extends AbstractParser {
     constructor(text) {
@@ -29,7 +30,13 @@ export class AbstractMLParser extends AbstractParser {
             let element = this.openElements[this.openElements.length - 1];
             let last = element.children[element.children.length - 1];
             if (char == '<') {
-                if (this.text.substr(this.position, 4) == '<!--') {
+                if (this.text.substr(this.position, 2) == '<<') {
+                    this.position += 2;
+                    let result = this.parseExpression('>>');
+                    let node = new TExpressionSubnode();
+                    node.expression = result;
+                    element.children.push(node)
+                } else if (this.text.substr(this.position, 4) == '<!--') {
                     this.position += 4;
                     let text = this.readUntillText('-->');
                     this.position += 3;

@@ -57,6 +57,8 @@ export class ExpressionParser extends AbstractParser {
 
                         let value = this.parseNormal(2);
                         lastNode.args.push(value);
+                        if(this.text[this.position] ==',')
+                            this.position++;
                     }
                     this.position++;
                 } else {
@@ -82,6 +84,13 @@ export class ExpressionParser extends AbstractParser {
                 this.position+=2;
                 let right = this.parseNormal(5);
                 lastNode = new TEOrNull(lastNode, right);
+            } else if (char == ",") {
+                if (endLevel >= 2) {
+                    break;
+                }
+                else {
+                    throw new Error("Unexpected character");
+                }
             }else if (char == "+") {
                 if (endLevel >= 4) {
                     break;
@@ -110,7 +119,7 @@ export class ExpressionParser extends AbstractParser {
                 if (lastNode) {
                     break;
                 }
-                let name = this.readUntill(/['"\(\)=\.\s:>/+\-*?]/);
+                let name = this.readUntill(/['"\(\)=\.\s:>/+\-*?,]/);
                 if (name == 'true')
                     lastNode = new TEBoolean(true)
                 else if (name == 'false')

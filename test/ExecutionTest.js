@@ -43,8 +43,8 @@ describe('Execution', () => {
         env.document = document;
         env.variables.element = "<div>text</div>";
         const result = obj.execute(env);
-        expect(result.tagName).to.be.equal("div");
-        expect(result.textContent).to.be.equal("<div></div>");
+        expect(result.firstChild.tagName).to.be.equal("DIV");
+        expect(result.firstChild.textContent).to.be.equal("text");
     });
     it('basic element', async () => {
         const obj = XMLParser.Parse("<br/>");
