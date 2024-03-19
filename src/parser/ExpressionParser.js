@@ -53,7 +53,7 @@ export class ExpressionParser extends AbstractParser {
                     this.position++;
                     this.skipWhitespace();
                     while (this.text[this.position] != ')') {
-                        if (this.position >= this.text.length) throw new Error('Unexpected end of input');
+                        if (this.position >= this.text.length) this.throw('Unexpected end of input');
 
                         let value = this.parseNormal(2);
                         lastNode.args.push(value);
@@ -71,7 +71,7 @@ export class ExpressionParser extends AbstractParser {
                 if (endLevel >= 1) {
                     break;
                 } else {
-                    throw new Error("( not opened");
+                    this.throw("( not opened");
                 }
             } else if (char == "=" && this.text[this.position + 1] == "=") {
                 this.position += 2;
@@ -89,7 +89,7 @@ export class ExpressionParser extends AbstractParser {
                     break;
                 }
                 else {
-                    throw new Error("Unexpected character");
+                    this.throw("Unexpected character");
                 }
             }else if (char == "+") {
                 if (endLevel >= 4) {
@@ -113,7 +113,7 @@ export class ExpressionParser extends AbstractParser {
                 if (lastNode) {
                     break
                 } else {
-                    throw new Error("Unexpected character");
+                    this.throw("Unexpected character");
                 }
             } else {
                 if (lastNode) {

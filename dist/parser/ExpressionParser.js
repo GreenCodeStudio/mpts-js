@@ -81,7 +81,7 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
           this.skipWhitespace();
 
           while (this.text[this.position] != ')') {
-            if (this.position >= this.text.length) throw new Error('Unexpected end of input');
+            if (this.position >= this.text.length) this.throw('Unexpected end of input');
 
             var _value3 = this.parseNormal(2);
 
