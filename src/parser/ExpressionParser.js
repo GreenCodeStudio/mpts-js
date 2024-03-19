@@ -31,20 +31,20 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
             } else if (lastNode && char == '.') {
                 this.position++;
-                let name = this.readUntill(/['"\(\)=\.:\s>+\-*?]/);
+                let name = this.readUntil(/['"\(\)=\.:\s>+\-*?]/);
                 lastNode = new TEProperty(lastNode, name);
             } else if (/[0-9\.]/.test(char)) {
                 this.position++;
-                let value = char+this.readUntill(/[^0-9\.e]/);
+                let value = char+this.readUntil(/[^0-9\.e]/);
                 lastNode = new TENumber(+value);
             } else if (char == '"') {
                 this.position++;
-                let value = this.readUntill(/"/);
+                let value = this.readUntil(/"/);
                 this.position++;
                 lastNode = new TEString(value);
             } else if (char == "'") {
                 this.position++;
-                let value = this.readUntill(/'/);
+                let value = this.readUntil(/'/);
                 this.position++;
                 lastNode = new TEString(value);
             } else if (char == "(") {
@@ -119,7 +119,7 @@ export class ExpressionParser extends AbstractParser {
                 if (lastNode) {
                     break;
                 }
-                let name = this.readUntill(/['"\(\)=\.\s:>/+\-*?,]/);
+                let name = this.readUntil(/['"\(\)=\.\s:>/+\-*?,]/);
                 if (name == 'true')
                     lastNode = new TEBoolean(true)
                 else if (name == 'false')

@@ -53,7 +53,7 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
       if (char == '<') {
         if (this.text.substr(this.position, 4) == '<!--') {
           this.position += 4;
-          var text = this.readUntillText('-->');
+          var text = this.readUntilText('-->');
           this.position += 3;
           element.children.push(new _TComment.TComment(text));
         } else if (this.text[this.position + 1] == '/') {
@@ -141,7 +141,7 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
       } else if (/\s/.test(_char)) {
         this.position++;
       } else {
-        var name = this.readUntill(/[\s=/]/);
+        var name = this.readUntil(/[\s=/]/);
         var value = null;
         this.skipWhitespace();
         _char = this.text[this.position];

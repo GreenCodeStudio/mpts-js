@@ -54,23 +54,23 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
         this.position++;
       } else if (lastNode && char == '.') {
         this.position++;
-        var name = this.readUntill(/['"\(\)=\.:\s>+\-*?]/);
+        var name = this.readUntil(/['"\(\)=\.:\s>+\-*?]/);
         lastNode = new _TEProperty.TEProperty(lastNode, name);
       } else if (/[0-9\.]/.test(char)) {
         this.position++;
-        var value = char + this.readUntill(/[^0-9\.e]/);
+        var value = char + this.readUntil(/[^0-9\.e]/);
         lastNode = new _TENumber.TENumber(+value);
       } else if (char == '"') {
         this.position++;
 
-        var _value = this.readUntill(/"/);
+        var _value = this.readUntil(/"/);
 
         this.position++;
         lastNode = new _TEString.TEString(_value);
       } else if (char == "'") {
         this.position++;
 
-        var _value2 = this.readUntill(/'/);
+        var _value2 = this.readUntil(/'/);
 
         this.position++;
         lastNode = new _TEString.TEString(_value2);
@@ -154,7 +154,7 @@ class ExpressionParser extends _AbstractParser.AbstractParser {
           break;
         }
 
-        var _name = this.readUntill(/['"\(\)=\.\s:>/+\-*?]/);
+        var _name = this.readUntil(/['"\(\)=\.\s:>/+\-*?]/);
 
         if (_name == 'true') lastNode = new _TEBoolean.TEBoolean(true);else if (_name == 'false') lastNode = new _TEBoolean.TEBoolean(false);else lastNode = new _TEVariable.TEVariable(_name);
       }

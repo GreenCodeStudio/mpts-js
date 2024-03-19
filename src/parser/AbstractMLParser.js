@@ -38,7 +38,7 @@ export class AbstractMLParser extends AbstractParser {
                     element.children.push(node)
                 } else if (this.text.substr(this.position, 4) == '<!--') {
                     this.position += 4;
-                    let text = this.readUntillText('-->');
+                    let text = this.readUntilText('-->');
                     this.position += 3;
                     element.children.push(new TComment(text))
                 } else if (this.text[this.position + 1] == '/') {
@@ -115,7 +115,7 @@ export class AbstractMLParser extends AbstractParser {
             } else if (/\s/.test(char)) {
                 this.position++;
             } else {
-                let name = this.readUntill(/[\s=/]/);
+                let name = this.readUntil(/[\s=/]/);
                 let value = null;
                 this.skipWhitespace()
                 char = this.text[this.position];

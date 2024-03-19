@@ -8,7 +8,7 @@ exports.AbstractParser = void 0;
 var _MptsParserError = require("./MptsParserError");
 
 class AbstractParser {
-  readUntill(regexp) {
+  readUntil(regexp) {
     var ret = '';
 
     while (this.position < this.text.length) {
@@ -22,10 +22,10 @@ class AbstractParser {
   }
 
   skipWhitespace() {
-    this.readUntill(/\S/);
+    this.readUntil(/\S/);
   }
 
-  readUntillText(text) {
+  readUntilText(text) {
     var ret = '';
 
     while (this.position < this.text.length) {

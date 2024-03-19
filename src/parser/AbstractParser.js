@@ -2,7 +2,7 @@ import {MptsParserError} from "./MptsParserError";
 
 export class AbstractParser {
 
-    readUntill(regexp) {
+    readUntil(regexp) {
         let ret = '';
         while (this.position < this.text.length) {
             const char = this.text[this.position];
@@ -15,10 +15,10 @@ export class AbstractParser {
     }
 
     skipWhitespace() {
-        this.readUntill(/\S/)
+        this.readUntil(/\S/)
     }
 
-    readUntillText(text) {
+    readUntilText(text) {
         let ret = '';
         while (this.position < this.text.length) {
             const char = this.text[this.position];
