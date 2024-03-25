@@ -4,8 +4,9 @@
 name: Node.js Package
 
 on:
-  release:
-    types: [created]
+  push:
+
+  pull_request:
 
 jobs:
   test12:
@@ -17,7 +18,7 @@ jobs:
           node-version: 12
       - run: npm ci
       - run: npm test
-      
+
   test14:
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +28,7 @@ jobs:
           node-version: 14
       - run: npm ci
       - run: npm test
-      
+
   test16:
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +38,7 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: npm test
-      
+
   test18:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +48,7 @@ jobs:
           node-version: 18
       - run: npm ci
       - run: npm test
-      
+
   test20:
     runs-on: ubuntu-latest
     steps:
