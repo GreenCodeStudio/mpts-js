@@ -31,7 +31,7 @@ describe('XMLParser', () => {
     it('bad order of close', async () => {
         expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
         expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <span>/);
-        expect(()=>parser.Parse("<span><strong></span></strong>")).to.throw(/1:14/);
+        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/1:14/);
     });
 
     describe('cases from real life', () => {
