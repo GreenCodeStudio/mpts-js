@@ -35,11 +35,13 @@ export function UniParserTest(parser){
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].tagName).to.be.equals("div");
     });
+
     it('not opened element', async () => {
         expect(()=>parser.Parse("</div>")).to.throw(MptsParserError);
         expect(()=>parser.Parse("</div>")).to.throw(/Last opened element is not <div>/);
         expect(()=>parser.Parse("</div>")).to.throw(/1:0/);
     });
+
     it('elementsinside', async () => {
         const obj = parser.Parse("<div><p><strong></strong><span></span></p></div>");
         expect(obj.children[0]).to.be.instanceOf(TElement);
