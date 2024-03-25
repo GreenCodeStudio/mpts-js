@@ -65,9 +65,7 @@ export class AbstractMLParser extends AbstractParser {
                         this.convertToSpecialElement(result, element);
 
                     } else {
-                        element.children.push(result.element)
-                        if (!result.autoclose && !this.voidElements.includes(result.element.tagName.toLowerCase()))
-                            this.openElements.push(result.element);
+                        this.addElement(result.element, result.autoclose)
                     }
                 }
             } else if (char == '{' && this.text[this.position + 1] == '{') {

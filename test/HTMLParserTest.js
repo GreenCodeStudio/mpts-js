@@ -67,6 +67,25 @@ describe('HTMLParser', () => {
             expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
             expect(obj.children[0].children[1].tagName).to.be.equals("section");
         });
+        it('ul li', async () => {
+           const obj= HTMLParser.Parse("<ul><li>one<li>two<li>three</ul>");
+
+              expect(obj).to.be.instanceOf(TDocumentFragment);
+                expect(obj.children[0]).to.be.instanceOf(TElement);
+                expect(obj.children[0].tagName).to.be.equals("ul");
+                expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+                expect(obj.children[0].children[0].tagName).to.be.equals("li");
+                expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
+                expect(obj.children[0].children[0].children[0].text).to.be.equals("one");
+                expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
+                expect(obj.children[0].children[1].tagName).to.be.equals("li");
+                expect(obj.children[0].children[1].children[0]).to.be.instanceOf(TText);
+                expect(obj.children[0].children[1].children[0].text).to.be.equals("two");
+                expect(obj.children[0].children[2]).to.be.instanceOf(TElement);
+                expect(obj.children[0].children[2].tagName).to.be.equals("li");
+                expect(obj.children[0].children[2].children[0]).to.be.instanceOf(TText);
+                expect(obj.children[0].children[2].children[0].text).to.be.equals("three");
+        });
         /*
         8.1.2.4 Optional tags
 Certain tags can be omitted.

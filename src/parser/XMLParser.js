@@ -27,4 +27,10 @@ export class XMLParser extends AbstractMLParser {
     static Parse(text) {
         return (new XMLParser(text)).parseNormal();
     }
+    addElement(element, autoclose=false){
+        let parent = this.openElements[this.openElements.length - 1];
+        parent.children.push(element)
+        if (!autoclose)
+            this.openElements.push(element);
+    }
 }

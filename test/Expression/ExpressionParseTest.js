@@ -5,6 +5,7 @@ import {TEEqual} from "../../src/nodes/expressions/TEEqual";
 import {TEProperty} from "../../src/nodes/expressions/TEProperty";
 import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall";
 import {TEOrNull} from "../../src/nodes/expressions/TEOrNull";
+import {TEAdd} from "../../src/nodes/expressions/TEAdd";
 
 const {ExpressionParser} = require("../../src/parser/ExpressionParser");
 const {TEVariable} = require("../../src/nodes/expressions/TEVariable");

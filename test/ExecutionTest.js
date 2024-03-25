@@ -29,6 +29,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("<AB©&>");
     });
+
     it('encoded text from variable', async () => {
         const obj = XMLParser.Parse("{{element}}");
         const env = new Environment();
@@ -37,6 +38,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("<div></div>");
     });
+
     it('encoded html from variable', async () => {
         const obj = XMLParser.Parse("<<element>>");
         const env = new Environment();
@@ -61,6 +63,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div><p><strong></strong><span></span></p></div>");
     });
+
     it('basic html', async () => {
         const obj = XMLParser.Parse("<div>&#65;&#x0042;{{c}}</div>");
         const env = new Environment();
@@ -69,6 +72,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div>ABC</div>");
     });
+
     it('element with attributes', async () => {
         const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e) f ></div>");
         const env = new Environment();
@@ -78,6 +82,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div a=\"1\" b=\"2\" c=\"3\" d=\"4\" e=\"5\" f=\"f\"></div>");
     });
+
     it('if else', async () => {
         const obj = XMLParser.Parse('<:if condition=(v==1)>a</:if><:else-if condition=(v==2)>b</:else-if><:else>c</:else>');
         const env = new Environment();
@@ -105,6 +110,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal('<a class="button" href="/PalletMovement/add"><span class="icon-add"></span>Dodaj</a>');
     })
+
     it('loop', async () => {
         const obj = XMLParser.Parse("<:loop count=10>b</:loop>");
         const env = new Environment();
@@ -112,6 +118,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("bbbbbbbbbb");
     })
+
     it('loop by variable', async () => {
         const obj = XMLParser.Parse("<:loop count=a>b</:loop>");
         const env = new Environment();
@@ -120,6 +127,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("bbb");
     })
+
     it('foreach basic', async () => {
         const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
         const env = new Environment();
@@ -128,6 +136,7 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("bbbbb");
     })
+
     it('foreach advanced', async () => {
         const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         const env = new Environment();
