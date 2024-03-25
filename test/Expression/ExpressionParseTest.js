@@ -64,32 +64,44 @@ describe('ExpressionTest', () => {
         });
         it('equal', async () => {
             const obj = ExpressionParser.Parse('a==b');
+
             expect(obj).to.be.instanceOf(TEEqual)
             expect(obj.left).to.be.instanceOf(TEVariable)
             expect(obj.left.name).to.be.equal("a")
             expect(obj.right).to.be.instanceOf(TEVariable)
             expect(obj.right.name).to.be.equal("b")
         });
+
         it('equal double', async () => {
             const obj = ExpressionParser.Parse('(a==b)==(c==d)');
+
             expect(obj).to.be.instanceOf(TEEqual)
             expect(obj.left).to.be.instanceOf(TEEqual)
+            expect(obj.left.left).to.be.instanceOf(TEVariable)
             expect(obj.left.left.name).to.be.equal("a")
+            expect(obj.left.right).to.be.instanceOf(TEVariable)
             expect(obj.left.right.name).to.be.equal("b")
+
             expect(obj.right).to.be.instanceOf(TEEqual)
+            expect(obj.right.left).to.be.instanceOf(TEVariable)
             expect(obj.right.left.name).to.be.equal("c")
+            expect(obj.right.right).to.be.instanceOf(TEVariable)
             expect(obj.right.right.name).to.be.equal("d")
         });
+
         it('methodCall', async () => {
             const obj = ExpressionParser.Parse('fun(x)');
+
             expect(obj).to.be.instanceOf(TEMethodCall)
             expect(obj.source).to.be.instanceOf(TEVariable)
             expect(obj.source.name).to.be.equal("fun")
             expect(obj.args[0]).to.be.instanceOf(TEVariable)
             expect(obj.args[0].name).to.be.equal("x")
         });
+
         it('methodCallMultiArgument', async () => {
             const obj = ExpressionParser.Parse('fun(x,y,z)');
+
             expect(obj).to.be.instanceOf(TEMethodCall)
             expect(obj.source).to.be.instanceOf(TEVariable)
             expect(obj.source.name).to.be.equal("fun")
@@ -100,6 +112,7 @@ describe('ExpressionTest', () => {
             expect(obj.args[2]).to.be.instanceOf(TEVariable)
             expect(obj.args[2].name).to.be.equal("z")
         });
+
         it('methodCallString', async () => {
             const obj = ExpressionParser.Parse('fun("x")');
             expect(obj).to.be.instanceOf(TEMethodCall)
@@ -141,6 +154,38 @@ describe('ExpressionTest', () => {
             expect(obj.left.source.name).to.be.equal("var1")
             expect(obj.right).to.be.instanceOf(TEString)
             expect(obj.right.value).to.be.equal("empty")
+        });
+
+        it('functionCall', async () => {
+            const obj = ExpressionParser.Parse('fun1(param)');
+
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("fun1")
+            expect(obj.args[0]).to.be.instanceOf(TEVariable)
+            expect(obj.args[0].name).to.be.equal("param")
+        });
+
+        it('functionCall2', async () => {
+            const obj = ExpressionParser.Parse('getView("User", "PermissionsEdit", data)');
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("getView")
+            expect(obj.args[0]).to.be.instanceOf(TEString)
+            expect(obj.args[0].value).to.be.equal("User")
+            expect(obj.args[1]).to.be.instanceOf(TEString)
+            expect(obj.args[1].value).to.be.equal("PermissionsEdit")
+            expect(obj.args[2]).to.be.instanceOf(TEVariable)
+            expect(obj.args[2].name).to.be.equal("data")
+        });
+
+        it('add', async () => {
+            const obj = ExpressionParser.Parse('a+b');
+            expect(obj).to.be.instanceOf(TEAdd)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("a")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("b")
         });
     });
 });
