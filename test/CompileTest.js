@@ -109,4 +109,13 @@ describe('Compile', () => {
         const result = eval(compiled.code + compiled.rootName);
         expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\"></div>");
     });
+    it('disabled', async () => {
+        const obj = XMLParser.Parse("<input disabled=(a==1) /><input disabled=(a==2) />");
+        const compiled = obj.compileJS();
+        const document = (new JSDOM(`...`)).window.document;
+        let variables = {a:1}
+        const result = eval(compiled.code + compiled.rootName);
+        expect(result.children[0].disabled).to.be.equal(true);
+        expect(result.children[1].disabled).to.be.equal(false);
+    });
 })

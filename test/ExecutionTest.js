@@ -163,4 +163,13 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\"></div>");
     });
+    it('disabled', async () => {
+        const obj = XMLParser.Parse("<input disabled=(a==1) /><input disabled=(a==2) />");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = 1;
+        const result = obj.execute(env);
+        expect(result.children[0].disabled).to.be.equal(true);
+        expect(result.children[1].disabled).to.be.equal(false);
+    });
 })

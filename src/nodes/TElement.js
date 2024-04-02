@@ -13,8 +13,11 @@ export class TElement extends TNode {
                 let value = attr.expression.execute(env);
                 if (typeof value === 'function')
                     ret[attr.name] = value;
-                else
-                    ret.setAttribute(attr.name, attr.expression.execute(env));
+                else {
+                    if(value!==undefined && value!==null && value!==false) {
+                        ret.setAttribute(attr.name, value);
+                    }
+                }
             } else
                 ret.setAttribute(attr.name, attr.name);
         }
@@ -31,7 +34,7 @@ export class TElement extends TNode {
             if (attr.expression) {
                 let attrValueName = getUniqName();
                 code+='const '+attrValueName+'='+attr.expression.compileJS(scopedVariables).code+';';
-                code+=`if(typeof ${attrValueName}==='function')${rootName}[${JSON.stringify(attr.name)}]=${attrValueName};else ${rootName}.setAttribute(${JSON.stringify(attr.name)},${attrValueName});`;
+                code+=`if(typeof ${attrValueName}==='function')${rootName}[${JSON.stringify(attr.name)}]=${attrValueName};else if(${attrValueName}!== undefined&&${attrValueName}!== null&&${attrValueName}!== false) ${rootName}.setAttribute(${JSON.stringify(attr.name)},${attrValueName});`;
             }
             else
                 code += rootName + ".setAttribute(" + JSON.stringify(attr.name) + ", " + JSON.stringify(attr.name) + ");";
