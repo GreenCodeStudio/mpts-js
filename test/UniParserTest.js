@@ -114,7 +114,8 @@ export function UniParserTest(parser){
     });
 
     it('if', async () => {
-        const obj = parser.Parse("<:if condition=false>text</:if><:else>text</:else>");
+        const whitespace=' \t\n\r'
+        const obj = parser.Parse("<:if condition=false>text</:if>"+whitespace+"<:else>text</:else>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TIf);
         expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);

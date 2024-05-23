@@ -166,6 +166,17 @@ export class AbstractMLParser extends AbstractParser {
         return ExpressionParser.Parse(text);
     }
 
+    clearLastWhitespace(element) {
+        while (element.children.length > 0) {
+            const last = element.children[element.children.length - 1];
+            if (last instanceof TText && last.text.trim() == "") {
+                element.children.pop();
+            } else {
+                break;
+            }
+        }
+    }
+
     convertToSpecialElement(result, element) {
         if (result.element.tagName.toLowerCase() == ':if') {
             let node = new TIf();
@@ -176,6 +187,7 @@ export class AbstractMLParser extends AbstractParser {
             if (!result.autoclose)
                 this.openElements.push(node);
         } else if (result.element.tagName.toLowerCase() == ':else-if') {
+            this.clearLastWhitespace(element);
             const last = element.children[element.children.length - 1];
             if (!(last instanceof TIf && last.else == null))
                 this.throw("need if before else-if")
@@ -186,6 +198,7 @@ export class AbstractMLParser extends AbstractParser {
             if (!result.autoclose)
                 this.openElements.push(last);
         } else if (result.element.tagName.toLowerCase() == ':else') {
+            this.clearLastWhitespace(element);
             const last = element.children[element.children.length - 1];
             if (!(last instanceof TIf && last.else == null))
                 this.throw("need if before else")
