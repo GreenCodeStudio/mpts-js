@@ -1,6 +1,6 @@
 {
   "name": "mpts-core",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Multi Platform Template System",
   "main": "dist/index.js",
   "repository": "https://github.com/GreenCodeStudio/mpts-js",
