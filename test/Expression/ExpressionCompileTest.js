@@ -1,9 +1,7 @@
 import {expect} from "chai";
-import {TEString} from "../../src/nodes/expressions/TEString";
-import {TENumber} from "../../src/nodes/expressions/TENumber";
-const {ExpressionParser} = require("../../src/parser/ExpressionParser");
-const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
-const {TEBoolean} = require("../../src/nodes/expressions/TEBoolean");
+import {TENumber} from "../../src/nodes/expressions/TENumber.js";
+import {ExpressionParser} from "../../src/parser/ExpressionParser.js";
+
 
 describe('ExpressionTest', () => {
     describe('compile', () => {

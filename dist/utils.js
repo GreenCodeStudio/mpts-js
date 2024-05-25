@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getUniqName = getUniqName;
 var i = 0;
-
 function getUniqName() {
   return '_' + i++;
 }

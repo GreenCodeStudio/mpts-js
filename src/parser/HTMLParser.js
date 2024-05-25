@@ -1,6 +1,5 @@
-import {XMLParser} from "./XMLParser";
-import {AbstractMLParser} from "./AbstractMLParser";
-import {TElement} from "../nodes/TElement";
+import {AbstractMLParser} from "./AbstractMLParser.js";
+import {TElement} from "../nodes/TElement.js";
 
 export class HTMLParser extends AbstractMLParser {
     voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];

@@ -1,6 +1,6 @@
-import {getUniqName} from "../utils";
+import {getUniqName} from "../utils.js";
 import he from "he";
-import {TNode} from "./TNode";
+import {TNode} from "./TNode.js";
 
 export class TComment extends TNode {
     text = "";

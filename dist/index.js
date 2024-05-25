@@ -15,7 +15,5 @@ Object.defineProperty(exports, "XMLParser", {
     return _XMLParser.XMLParser;
   }
 });
-
 var _Environment = require("./Environment");
-
 var _XMLParser = require("./parser/XMLParser");

@@ -1,5 +1,4 @@
-import {getUniqName} from "../../utils";
-import {TEExpression} from "./TEExpression";
+import {TEExpression} from "./TEExpression.js";
 
 export class TEBoolean extends TEExpression{
     value = false;

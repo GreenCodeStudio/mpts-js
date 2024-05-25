@@ -1,4 +1,4 @@
-import {TEExpression} from "./TEExpression";
+import {TEExpression} from "./TEExpression.js";
 
 export class TEOrNull extends TEExpression {
     constructor(left, right) {

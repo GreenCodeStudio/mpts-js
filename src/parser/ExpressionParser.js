@@ -1,16 +1,16 @@
-import {TDocumentFragment} from "../nodes/TDocumentFragment";
-import {TEVariable} from "../nodes/expressions/TEVariable";
-import {TEBoolean} from "../nodes/expressions/TEBoolean";
-import {TENumber} from "../nodes/expressions/TENumber";
-import {TEString} from "../nodes/expressions/TEString";
-import {TEEqual} from "../nodes/expressions/TEEqual";
-import {AbstractParser} from "./AbstractParser";
-import {TEProperty} from "../nodes/expressions/TEProperty";
-import {TEMethodCall} from "../nodes/expressions/TEMethodCall";
-import {TEConcatenate} from "../nodes/expressions/TEConcatenate";
-import {TEAdd} from "../nodes/expressions/TEAdd";
-import {TESubtract} from "../nodes/expressions/TESubtract";
-import {TEOrNull} from "../nodes/expressions/TEOrNull";
+import {TDocumentFragment} from "../nodes/TDocumentFragment.js";
+import {TEVariable} from "../nodes/expressions/TEVariable.js";
+import {TEBoolean} from "../nodes/expressions/TEBoolean.js";
+import {TENumber} from "../nodes/expressions/TENumber.js";
+import {TEString} from "../nodes/expressions/TEString.js";
+import {TEEqual} from "../nodes/expressions/TEEqual.js";
+import {AbstractParser} from "./AbstractParser.js";
+import {TEProperty} from "../nodes/expressions/TEProperty.js";
+import {TEMethodCall} from "../nodes/expressions/TEMethodCall.js";
+import {TEConcatenate} from "../nodes/expressions/TEConcatenate.js";
+import {TEAdd} from "../nodes/expressions/TEAdd.js";
+import {TESubtract} from "../nodes/expressions/TESubtract.js";
+import {TEOrNull} from "../nodes/expressions/TEOrNull.js";
 
 export class ExpressionParser extends AbstractParser {
     constructor(text) {

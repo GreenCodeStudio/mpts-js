@@ -1,16 +1,16 @@
 import {expect} from "chai";
-import {TEString} from "../../src/nodes/expressions/TEString";
-import {TENumber} from "../../src/nodes/expressions/TENumber";
-import {TEEqual} from "../../src/nodes/expressions/TEEqual";
-import {TEProperty} from "../../src/nodes/expressions/TEProperty";
-import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall";
-import {TEOrNull} from "../../src/nodes/expressions/TEOrNull";
-import {TEAdd} from "../../src/nodes/expressions/TEAdd";
+import {TEString} from "../../src/nodes/expressions/TEString.js";
+import {TENumber} from "../../src/nodes/expressions/TENumber.js";
+import {TEEqual} from "../../src/nodes/expressions/TEEqual.js";
+import {TEProperty} from "../../src/nodes/expressions/TEProperty.js";
+import {TEMethodCall} from "../../src/nodes/expressions/TEMethodCall.js";
+import {TEOrNull} from "../../src/nodes/expressions/TEOrNull.js";
+import {TEAdd} from "../../src/nodes/expressions/TEAdd.js";
+import {ExpressionParser} from "../../src/parser/ExpressionParser.js";
+import {TEVariable} from "../../src/nodes/expressions/TEVariable.js";
+import {TEBoolean} from "../../src/nodes/expressions/TEBoolean.js";
+import {TEConcatenate} from "../../src/nodes/expressions/TEConcatenate.js";
 
-const {ExpressionParser} = require("../../src/parser/ExpressionParser");
-const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
-const {TEBoolean} = require("../../src/nodes/expressions/TEBoolean");
-const {TEConcatenate} = require("../../src/nodes/expressions/TEConcatenate");
 
 describe('ExpressionTest', () => {
     describe('parse', () => {

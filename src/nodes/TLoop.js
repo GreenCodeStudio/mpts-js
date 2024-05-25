@@ -1,4 +1,4 @@
-import {TNode} from "./TNode";
+import {TNode} from "./TNode.js";
 
 export class TLoop extends TNode {
     children = [];

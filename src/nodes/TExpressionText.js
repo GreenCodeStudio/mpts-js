@@ -1,7 +1,5 @@
-import {getUniqName} from "../utils";
-import he from "he";
-import {TText} from "./TText";
-import {TNode} from "./TNode";
+import {getUniqName} from "../utils.js";
+import {TNode} from "./TNode.js";
 
 export class TExpressionText extends TNode{
     expression = null;

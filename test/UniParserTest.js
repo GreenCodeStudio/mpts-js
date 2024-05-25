@@ -1,19 +1,18 @@
-import {parser} from "../src";
 import {expect} from "chai";
-import {TDocumentFragment} from "../src/nodes/TDocumentFragment";
-import {TText} from "../src/nodes/TText";
-import {TElement} from "../src/nodes/TElement";
-import {MptsParserError} from "../src/parser/MptsParserError";
-import {TAttribute} from "../src/nodes/TAttribute";
-import {TEString} from "../src/nodes/expressions/TEString";
-import {TEVariable} from "../src/nodes/expressions/TEVariable";
-import {TEMethodCall} from "../src/nodes/expressions/TEMethodCall";
-import {TComment} from "../src/nodes/TComment";
-import {TIf} from "../src/nodes/TIf";
-import {TEBoolean} from "../src/nodes/expressions/TEBoolean";
-import {TLoop} from "../src/nodes/TLoop";
-import {TENumber} from "../src/nodes/expressions/TENumber";
-import {TForeach} from "../src/nodes/TForeach";
+import {TDocumentFragment} from "../src/nodes/TDocumentFragment.js";
+import {TText} from "../src/nodes/TText.js";
+import {TElement} from "../src/nodes/TElement.js";
+import {MptsParserError} from "../src/parser/MptsParserError.js";
+import {TAttribute} from "../src/nodes/TAttribute.js";
+import {TEString} from "../src/nodes/expressions/TEString.js";
+import {TEVariable} from "../src/nodes/expressions/TEVariable.js";
+import {TEMethodCall} from "../src/nodes/expressions/TEMethodCall.js";
+import {TComment} from "../src/nodes/TComment.js";
+import {TIf} from "../src/nodes/TIf.js";
+import {TEBoolean} from "../src/nodes/expressions/TEBoolean.js";
+import {TLoop} from "../src/nodes/TLoop.js";
+import {TENumber} from "../src/nodes/expressions/TENumber.js";
+import {TForeach} from "../src/nodes/TForeach.js";
 
 export function UniParserTest(parser){
     it('basic text', async () => {

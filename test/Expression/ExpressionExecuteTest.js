@@ -1,13 +1,8 @@
 import {expect} from "chai";
-import {TEString} from "../../src/nodes/expressions/TEString";
-import {TENumber} from "../../src/nodes/expressions/TENumber";
-import {JSDOM} from "jsdom";
-import {Environment} from "../../src";
+import {Environment} from "../../src/Environment.js";
 
-const {ExpressionParser} = require("../../src/parser/ExpressionParser");
-const {TEVariable} = require("../../src/nodes/expressions/TEVariable");
-const {TEBoolean} = require("../../src/nodes/expressions/TEBoolean");
-const {document} = (new JSDOM(`...`)).window;
+import {ExpressionParser} from "../../src/parser/ExpressionParser.js";
+
 
 describe('ExpressionTest', () => {
     describe('Execute', () => {

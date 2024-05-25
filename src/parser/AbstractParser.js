@@ -1,4 +1,4 @@
-import {MptsParserError} from "./MptsParserError";
+import {MptsParserError} from "./MptsParserError.js";
 
 export class AbstractParser {
 

@@ -1,8 +1,12 @@
-const {XMLParser} = require("../src/parser/XMLParser");
-const {TDocumentFragment} = require("../src/nodes/TDocumentFragment");
-const {Environment} = require("../src/Environment");
-const {expect} = require("chai");
-const {JSDOM} = require("jsdom");
+import {XMLParser} from "../src/parser/XMLParser.js";
+
+
+import {Environment} from "../src/Environment.js";
+
+import {expect} from "chai";
+
+import {JSDOM} from "jsdom";
+
 const {document} = (new JSDOM(`...`)).window;
 
 function fragmentToHtml(fragment) {

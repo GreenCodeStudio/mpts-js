@@ -1,5 +1,5 @@
-import {getUniqName} from "../utils";
-import {TNode} from "./TNode";
+import {getUniqName} from "../utils.js";
+import {TNode} from "./TNode.js";
 
 export class TDocumentFragment extends TNode{
     children = []

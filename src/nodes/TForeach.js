@@ -1,5 +1,5 @@
-import {TNode} from "./TNode";
-import {getUniqName} from "../utils";
+import {TNode} from "./TNode.js";
+import {getUniqName} from "../utils.js";
 
 export class TForeach extends TNode {
     children = [];

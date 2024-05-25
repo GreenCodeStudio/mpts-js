@@ -1,18 +1,15 @@
-import {TDocumentFragment} from "../nodes/TDocumentFragment";
-import {TText} from "../nodes/TText";
-import {TElement} from "../nodes/TElement";
-import {TEVariable} from "../nodes/expressions/TEVariable";
-import {TExpressionText} from "../nodes/TExpressionText";
-import {TAttribute} from "../nodes/TAttribute";
-import {TIf} from "../nodes/TIf";
-import {ExpressionParser} from "./ExpressionParser";
-import {TEString} from "../nodes/expressions/TEString";
-import {AbstractParser} from "./AbstractParser";
-import {TLoop} from "../nodes/TLoop";
-import {TComment} from "../nodes/TComment";
-import {TForeach} from "../nodes/TForeach";
-import {MptsParserError} from "./MptsParserError";
-import {TExpressionSubnode} from "../nodes/TExpressionSubnode";
+import {TDocumentFragment} from "../nodes/TDocumentFragment.js";
+import {TText} from "../nodes/TText.js";
+import {TElement} from "../nodes/TElement.js";
+import {TExpressionText} from "../nodes/TExpressionText.js";
+import {TAttribute} from "../nodes/TAttribute.js";
+import {TIf} from "../nodes/TIf.js";
+import {ExpressionParser} from "./ExpressionParser.js";
+import {AbstractParser} from "./AbstractParser.js";
+import {TLoop} from "../nodes/TLoop.js";
+import {TComment} from "../nodes/TComment.js";
+import {TForeach} from "../nodes/TForeach.js";
+import {TExpressionSubnode} from "../nodes/TExpressionSubnode.js";
 
 export class AbstractMLParser extends AbstractParser {
     constructor(text) {
