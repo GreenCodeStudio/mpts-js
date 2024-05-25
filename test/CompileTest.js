@@ -65,7 +65,7 @@ describe('Compile', () => {
         expect(result1.textContent).to.be.equal("a");
     })
     it('if basic2', async () => {
-        const obj = XMLParser.Parse("<:if condition=a>a</:if><:else-if condition=b>b</:else-if>");
+        const obj = XMLParser.Parse("<:if condition=a>a</:if><:else-if condition=b>b</:else-if><:else>c</:else>");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
 
@@ -81,7 +81,7 @@ describe('Compile', () => {
 
         variables = {a: false, b: false};
         const result3 = eval(compiled.code + compiled.rootName);
-        expect(result3.textContent).to.be.equal("");
+        expect(result3.textContent).to.be.equal("c");
 
 
     })

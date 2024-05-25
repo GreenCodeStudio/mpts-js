@@ -41,6 +41,15 @@ export class TIf extends TNode {
             }
             code += '}'
         }
+        if (this.else) {
+            code += 'else{'
+            for (const child of this.else.children) {
+                let childResult = child.compileJS(scopedVariables);
+                code += childResult.code;
+                code += rootName + ".append(" + childResult.rootName + ");"
+            }
+            code += '}'
+        }
         return {code, rootName};
     }
 

@@ -122,6 +122,28 @@ export function UniParserTest(parser){
         expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
         expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
     });
+    it('else-if', async () => {
+        const whitespace=' \t\n\r'
+        const obj = parser.Parse("<:if condition=false>text</:if>"+whitespace+"<:else-if condition=false>text</:else-if>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].conditions[1].expression).to.be.instanceOf(TEBoolean);
+        expect(obj.children[0].conditions[1].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].else).to.be.null;
+    });
+    it('else-if-else', async () => {
+        const whitespace=' \t\n\r'
+        const obj = parser.Parse("<:if condition=false>text</:if>"+whitespace+"<:else-if condition=false>text</:else-if><:else>text</:else>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEBoolean);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].conditions[1].expression).to.be.instanceOf(TEBoolean);
+        expect(obj.children[0].conditions[1].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
+    });
     it('loop', async () => {
         const obj = parser.Parse("<:loop count=10>b</:loop>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
