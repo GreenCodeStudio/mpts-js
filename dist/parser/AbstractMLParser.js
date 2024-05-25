@@ -4,21 +4,18 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.AbstractMLParser = void 0;
-var _TDocumentFragment = require("../nodes/TDocumentFragment");
-var _TText = require("../nodes/TText");
-var _TElement = require("../nodes/TElement");
-var _TEVariable = require("../nodes/expressions/TEVariable");
-var _TExpressionText = require("../nodes/TExpressionText");
-var _TAttribute = require("../nodes/TAttribute");
-var _TIf = require("../nodes/TIf");
-var _ExpressionParser = require("./ExpressionParser");
-var _TEString = require("../nodes/expressions/TEString");
-var _AbstractParser = require("./AbstractParser");
-var _TLoop = require("../nodes/TLoop");
-var _TComment = require("../nodes/TComment");
-var _TForeach = require("../nodes/TForeach");
-var _MptsParserError = require("./MptsParserError");
-var _TExpressionSubnode = require("../nodes/TExpressionSubnode");
+var _TDocumentFragment = require("../nodes/TDocumentFragment.js");
+var _TText = require("../nodes/TText.js");
+var _TElement = require("../nodes/TElement.js");
+var _TExpressionText = require("../nodes/TExpressionText.js");
+var _TAttribute = require("../nodes/TAttribute.js");
+var _TIf = require("../nodes/TIf.js");
+var _ExpressionParser = require("./ExpressionParser.js");
+var _AbstractParser = require("./AbstractParser.js");
+var _TLoop = require("../nodes/TLoop.js");
+var _TComment = require("../nodes/TComment.js");
+var _TForeach = require("../nodes/TForeach.js");
+var _TExpressionSubnode = require("../nodes/TExpressionSubnode.js");
 class AbstractMLParser extends _AbstractParser.AbstractParser {
   constructor(text) {
     super();

@@ -4,19 +4,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.ExpressionParser = void 0;
-var _TDocumentFragment = require("../nodes/TDocumentFragment");
-var _TEVariable = require("../nodes/expressions/TEVariable");
-var _TEBoolean = require("../nodes/expressions/TEBoolean");
-var _TENumber = require("../nodes/expressions/TENumber");
-var _TEString = require("../nodes/expressions/TEString");
-var _TEEqual = require("../nodes/expressions/TEEqual");
-var _AbstractParser = require("./AbstractParser");
-var _TEProperty = require("../nodes/expressions/TEProperty");
-var _TEMethodCall = require("../nodes/expressions/TEMethodCall");
-var _TEConcatenate = require("../nodes/expressions/TEConcatenate");
-var _TEAdd = require("../nodes/expressions/TEAdd");
-var _TESubtract = require("../nodes/expressions/TESubtract");
-var _TEOrNull = require("../nodes/expressions/TEOrNull");
+var _TDocumentFragment = require("../nodes/TDocumentFragment.js");
+var _TEVariable = require("../nodes/expressions/TEVariable.js");
+var _TEBoolean = require("../nodes/expressions/TEBoolean.js");
+var _TENumber = require("../nodes/expressions/TENumber.js");
+var _TEString = require("../nodes/expressions/TEString.js");
+var _TEEqual = require("../nodes/expressions/TEEqual.js");
+var _AbstractParser = require("./AbstractParser.js");
+var _TEProperty = require("../nodes/expressions/TEProperty.js");
+var _TEMethodCall = require("../nodes/expressions/TEMethodCall.js");
+var _TEConcatenate = require("../nodes/expressions/TEConcatenate.js");
+var _TEAdd = require("../nodes/expressions/TEAdd.js");
+var _TESubtract = require("../nodes/expressions/TESubtract.js");
+var _TEOrNull = require("../nodes/expressions/TEOrNull.js");
 class ExpressionParser extends _AbstractParser.AbstractParser {
   constructor(text) {
     super();

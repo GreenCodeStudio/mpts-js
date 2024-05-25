@@ -37,7 +37,7 @@ export class TForeach extends TNode {
         let rootName = getUniqName();
         let code = 'let ' + rootName + '=document.createDocumentFragment();';
 
-        code += 'for(let [_foreachKey,_foreachValue] of Object.entries(' + this.collection.compileJS().code + ')){';
+        code += 'for(let [_foreachKey,_foreachValue] of Object.entries(' + this.collection.compileJS(scopedVariables).code + ')){';
         let subScope = new Set(Array.from(scopedVariables));
 
         if (this.key) {

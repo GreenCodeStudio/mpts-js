@@ -4,9 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.TComment = void 0;
-var _utils = require("../utils");
+var _utils = require("../utils.js");
 var _he = _interopRequireDefault(require("he"));
-var _TNode = require("./TNode");
+var _TNode = require("./TNode.js");
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }

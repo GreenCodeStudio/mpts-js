@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.AbstractParser = void 0;
-var _MptsParserError = require("./MptsParserError");
+var _MptsParserError = require("./MptsParserError.js");
 class AbstractParser {
   readUntil(regexp) {
     var ret = '';

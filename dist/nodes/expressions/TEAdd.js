@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.TEAdd = void 0;
-var _TEExpression = require("./TEExpression");
+var _TEExpression = require("./TEExpression.js");
 class TEAdd extends _TEExpression.TEExpression {
   constructor(left, right) {
     super();
