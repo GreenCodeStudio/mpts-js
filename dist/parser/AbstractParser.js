@@ -31,7 +31,7 @@ class AbstractParser {
   }
   throw(message) {
     var lines = this.text.substr(0, this.position).split('\n');
-    throw new _MptsParserError.MptsParserError(message, lines.length, lines[lines.length - 1].length, this.text.substr(this.position, 10));
+    throw new _MptsParserError.MptsParserError(message, lines.length, lines[lines.length - 1].length, this.text.substr(this.position, 10), this.position);
   }
 }
 exports.AbstractParser = AbstractParser;

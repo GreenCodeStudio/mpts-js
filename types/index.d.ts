@@ -23,3 +23,11 @@ export class TDocumentFragment extends TNode {
 
 export class TNode {
 }
+
+export class MptsParserError extends Error{
+    messageRaw:string;
+    line:number;
+    column:number;
+    sample:string;
+    totalPosition:number;
+}
