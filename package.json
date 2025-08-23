@@ -1,16 +1,18 @@
 {
   "name": "mpts-core",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Multi Platform Template System",
-    "keywords": [
-        "mpts", "template", "language"
-    ],
+  "keywords": [
+    "mpts",
+    "template",
+    "language"
+  ],
   "main": "dist/index.js",
   "repository": "https://github.com/GreenCodeStudio/mpts-js",
   "author": "GreenCodeStudio",
   "license": "MIT",
   "type": "commonjs",
-    "types": "types/index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "mocha test test/Expression",
     "testCoverage": "nyc --reporter=text mocha test test/Expression --require @babel/register",
