@@ -6,7 +6,7 @@ export declare class Environment {
     scope(newVariables: object): Environment
 }
 
-export class Index {
+export class XmlParser {
     constructor(text: string);
 
     static Parse(text: string): TDocumentFragment;
