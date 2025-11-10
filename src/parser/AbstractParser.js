@@ -32,6 +32,6 @@ export class AbstractParser {
 
     throw(message) {
         let lines = this.text.substr(0, this.position).split('\n');
-        throw new MptsParserError(message, lines.length, lines[lines.length - 1].length, this.text.substr(this.position, 10), this.position)
+        throw new MptsParserError(message, lines.length, lines[lines.length - 1].length, this.text.substr(this.position, 10), this.position, this.fileName??null)
     }
 }

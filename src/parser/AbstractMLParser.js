@@ -53,7 +53,7 @@ export class AbstractMLParser extends AbstractParser {
                         this.openElements.reverse();
                     } else {
                         this.position = positionCopy;
-                        this.throw(`Last opened element is not <${name}>`);
+                        this.throw(`Last opened element is not <${name}> ${element.tagName?`but <${element.tagName}>`:''}`);
                     }
                 } else {
                     this.position++;

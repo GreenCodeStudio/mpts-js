@@ -17,12 +17,42 @@ describe('HTMLParser', () => {
         expect(obj.children[0].tagName).to.be.equals("div");
     });
 
-
     it('bad order of close', async () => {
-        expect(()=>HTMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
-        expect(()=>HTMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <strong>/);
+        expect(() => HTMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
+        expect(() => HTMLParser.Parse("<span><strong></span></strong>")).to.throw(/There is no opened elements, <strong> closed/);
+        expect(() => HTMLParser.Parse("<span><strong></span></strong>", "file.mpts")).to.throw(/file.mpts:0:11/);
     });
-    describe('ommiting tags',  () => {
+    describe('auto closing tags', async () => {
+        const tags = [
+            'area',
+            'base',
+            'br',
+            'col',
+            'embed',
+            'hr',
+            'img',
+            'input',
+            'link',
+            'meta',
+            'param',
+            'source',
+            'track',
+            'wbr'
+        ];
+        for (const tag of tags) {
+            it('auto closing <' + tag + '>', async () => {
+                const tagCase = tag.split().map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join('');
+
+                const obj = HTMLParser.Parse("<" + tagCase + ">after");
+                expect(obj).to.be.instanceOf(TDocumentFragment);
+                expect(obj.children[0]).to.be.instanceOf(TElement);
+                expect(obj.children[0].tagName).to.be.equal(tagCase);
+                expect(obj.children[1]).to.be.instanceOf(TText);
+                expect(obj.children[1].text).to.be.equal(after);
+            });
+        }
+    });
+    describe('ommiting tags', () => {
         it('typeDeep', async () => {
             const obj = HTMLParser.Parse("<div><div><div>");
             expect(obj).to.be.instanceOf(TDocumentFragment);
@@ -44,6 +74,78 @@ describe('HTMLParser', () => {
             expect(obj.children[2]).to.be.instanceOf(TElement);
             expect(obj.children[2].tagName).to.be.equals("p");
         });
+        it('p closed by parent', async () => {
+            const obj = HTMLParser.Parse("<div><p>content</div>");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equals("div");
+            expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[0].tagName).to.be.equals("p");
+            expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[0].children[0].text).to.be.equal("content");
+        });
+        describe('p closed by nextElement', async () => {
+            const options = ['address', 'article', 'aside', 'blockquote', 'dir', 'div', 'dl', 'fieldset', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'menu', 'nav', 'ol', 'p', 'pre', 'section', 'table', 'ul',]
+            for (const option of options) {
+
+                it('p closed by nextElement <' + option + '>', async () => {
+
+                    const obj = HTMLParser.Parse("<p>content<" + option + " />after");
+                    expect(obj).to.be.instanceOf(TDocumentFragment);
+                    expect(obj.children[0]).to.be.instanceOf(TElement);
+                    expect(obj.children[0].tagName).to.be.equals("p");
+                    expect(obj.children[1]).to.be.instanceOf(TElement);
+                    expect(obj.children[1].tagName).to.be.equals(option);
+                    expect(obj.children[2]).to.be.instanceOf(TText);
+                    expect(obj.children[2].text).to.be.equals('after');
+                });
+            }
+        })
+        describe('autoclose by next occurence', async () => {
+            const options = ['p','optgroup', 'option']
+            for (const option of options) {
+
+                it('autoclose by next occurence <' + option + '>', async () => {
+
+                    const obj = HTMLParser.Parse("<"+option+"><" + option + ">");
+                    expect(obj).to.be.instanceOf(TDocumentFragment);
+                    expect(obj.children[0]).to.be.instanceOf(TElement);
+                    expect(obj.children[0].tagName).to.be.equals(option);
+                    expect(obj.children[1]).to.be.instanceOf(TElement);
+                    expect(obj.children[1].tagName).to.be.equals(option);
+                });
+            }
+        })        ;
+
+
+        it('optgroup', async () => {
+            const obj = HTMLParser.Parse("<select><option>1<optgroup><option>2<option>3</select>");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equals("select");
+            expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[0].tagName).to.be.equals("option");
+            expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[0].children[0].text).to.be.equals("1");
+            expect(obj.children[0].children[1].tagName).to.be.equals("optgroup");
+            expect(obj.children[0].children[1].children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[1].children[0].tagName).to.be.equals("option");
+            expect(obj.children[0].children[1].children[0].children[0].text).to.be.equals("2");
+            expect(obj.children[0].children[1].children[1].tagName).to.be.equals("option");
+            expect(obj.children[0].children[1].children[1].children[0].text).to.be.equals("3");
+        });
+        it('p not closed by nextElement', async () => {
+            const obj = HTMLParser.Parse("<p>content<nonexisitng>subcontent</nonexisitng>");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equals("p");
+            expect(obj.children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[0].text).to.be.equal('content');
+            expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[1].tagName).to.be.equals("nonexisitng");
+            expect(obj.children[0].children[1].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[1].children[0].text).to.be.equal("subcontent");
+        });
         it('typeMix', async () => {
             const obj = HTMLParser.Parse("<div><br><section>");
             expect(obj).to.be.instanceOf(TDocumentFragment);
@@ -55,56 +157,68 @@ describe('HTMLParser', () => {
             expect(obj.children[0].children[1].tagName).to.be.equals("section");
         });
         it('ul li', async () => {
-           const obj= HTMLParser.Parse("<ul><li>one<li>two<li>three</ul>");
+            const obj = HTMLParser.Parse("<ul><li>one<li>two<li>three</ul>");
 
-              expect(obj).to.be.instanceOf(TDocumentFragment);
-                expect(obj.children[0]).to.be.instanceOf(TElement);
-                expect(obj.children[0].tagName).to.be.equals("ul");
-                expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
-                expect(obj.children[0].children[0].tagName).to.be.equals("li");
-                expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
-                expect(obj.children[0].children[0].children[0].text).to.be.equals("one");
-                expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
-                expect(obj.children[0].children[1].tagName).to.be.equals("li");
-                expect(obj.children[0].children[1].children[0]).to.be.instanceOf(TText);
-                expect(obj.children[0].children[1].children[0].text).to.be.equals("two");
-                expect(obj.children[0].children[2]).to.be.instanceOf(TElement);
-                expect(obj.children[0].children[2].tagName).to.be.equals("li");
-                expect(obj.children[0].children[2].children[0]).to.be.instanceOf(TText);
-                expect(obj.children[0].children[2].children[0].text).to.be.equals("three");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equals("ul");
+            expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[0].tagName).to.be.equals("li");
+            expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[0].children[0].text).to.be.equals("one");
+            expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[1].tagName).to.be.equals("li");
+            expect(obj.children[0].children[1].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[1].children[0].text).to.be.equals("two");
+            expect(obj.children[0].children[2]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[2].tagName).to.be.equals("li");
+            expect(obj.children[0].children[2].children[0]).to.be.instanceOf(TText);
+            expect(obj.children[0].children[2].children[0].text).to.be.equals("three");
+        });
+        it('dt element ommiting end tag', async () => {
+            // Test dt element followed by another dt element
+            const obj1 = HTMLParser.Parse("<dl><dt>term1<dt>term2<dd>def</dd></dl>");
+            expect(obj1).to.be.instanceOf(TDocumentFragment);
+            expect(obj1.children[0]).to.be.instanceOf(TElement);
+            expect(obj1.children[0].tagName).to.be.equals("dl");
+            expect(obj1.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj1.children[0].children[0].tagName).to.be.equals("dt");
+            expect(obj1.children[0].children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj1.children[0].children[0].children[0].text).to.be.equals("term1");
+            expect(obj1.children[0].children[1]).to.be.instanceOf(TElement);
+            expect(obj1.children[0].children[1].tagName).to.be.equals("dt");
+            expect(obj1.children[0].children[1].children[0]).to.be.instanceOf(TText);
+            expect(obj1.children[0].children[1].children[0].text).to.be.equals("term2");
+            expect(obj1.children[0].children[2]).to.be.instanceOf(TElement);
+            expect(obj1.children[0].children[2].tagName).to.be.equals("dd");
+            expect(obj1.children[0].children[2].children[0]).to.be.instanceOf(TText);
+            expect(obj1.children[0].children[2].children[0].text).to.be.equals("def");
+
+            // Test dt element followed by dd element
+            const obj2 = HTMLParser.Parse("<dl><dt>term<dd>def1<dd>def2</dd></dl>");
+            expect(obj2).to.be.instanceOf(TDocumentFragment);
+            expect(obj2.children[0]).to.be.instanceOf(TElement);
+            expect(obj2.children[0].tagName).to.be.equals("dl");
+            expect(obj2.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj2.children[0].children[0].tagName).to.be.equals("dt");
+            expect(obj2.children[0].children[0].children[0]).to.be.instanceOf(TText);
+            expect(obj2.children[0].children[0].children[0].text).to.be.equals("term");
+            expect(obj2.children[0].children[1]).to.be.instanceOf(TElement);
+            expect(obj2.children[0].children[1].tagName).to.be.equals("dd");
+            expect(obj2.children[0].children[1].children[0]).to.be.instanceOf(TText);
+            expect(obj2.children[0].children[1].children[0].text).to.be.equals("def1");
+            expect(obj2.children[0].children[2]).to.be.instanceOf(TElement);
+            expect(obj2.children[0].children[2].tagName).to.be.equals("dd");
+            expect(obj2.children[0].children[2].children[0]).to.be.instanceOf(TText);
+            expect(obj2.children[0].children[2].children[0].text).to.be.equals("def2");
         });
         /*
         8.1.2.4 Optional tags
-Certain tags can be omitted.
-
-Omitting an element's start tag does not mean the element is not present; it is implied, but it is still there. An HTML document always has a root html element, even if the string <html> doesn't appear anywhere in the markup.
-
-An html element's start tag may be omitted if the first thing inside the html element is not a comment.
-
-An html element's end tag may be omitted if the html element is not immediately followed by a comment.
-
-A head element's start tag may be omitted if the element is empty, or if the first thing inside the head element is an element.
-
-A head element's end tag may be omitted if the head element is not immediately followed by a space character or a comment.
-
-A body element's start tag may be omitted if the element is empty, or if the first thing inside the body element is not a space character or a comment, except if the first thing inside the body element is a script or style element.
-A body element's end tag may be omitted if the body element is not immediately followed by a comment.
-
-A li element's end tag may be omitted if the li element is immediately followed by another li element or if there is no more content in the parent element.
-
-A dt element's end tag may be omitted if the dt element is immediately followed by another dt element or a dd element.
-
-A dd element's end tag may be omitted if the dd element is immediately followed by another dd element or a dt element, or if there is no more content in the parent element.
-
-A p element's end tag may be omitted if the p element is immediately followed by an address, article, aside, blockquote, dir, div, dl, fieldset, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, menu, nav, ol, p, pre, section, table, or ul, element, or if there is no more content in the parent element and the parent element is not an a element.
 
 An rt element's end tag may be omitted if the rt element is immediately followed by an rt or rp element, or if there is no more content in the parent element.
 
 An rp element's end tag may be omitted if the rp element is immediately followed by an rt or rp element, or if there is no more content in the parent element.
 
-An optgroup element's end tag may be omitted if the optgroup element is immediately followed by another optgroup element, or if there is no more content in the parent element.
-
-An option element's end tag may be omitted if the option element is immediately followed by another option element, or if it is immediately followed by an optgroup element, or if there is no more content in the parent element.
 
 A colgroup element's start tag may be omitted if the first thing inside the colgroup element is a col element, and if the element is not immediately preceded by another colgroup element whose end tag has been omitted. (It can't be omitted if the element is empty.)
 

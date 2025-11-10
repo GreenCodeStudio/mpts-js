@@ -16,15 +16,15 @@ describe('XMLParser', () => {
 
 
     it('not closed element', async () => {
-        expect(()=>XMLParser.Parse("<div>")).to.throw(MptsParserError);
-        expect(()=>XMLParser.Parse("<div>")).to.throw(/Element <div> not closed/);
-        expect(()=>XMLParser.Parse("<div>")).to.throw(/1:5/);
+        expect(() => XMLParser.Parse("<div>")).to.throw(MptsParserError);
+        expect(() => XMLParser.Parse("<div>")).to.throw(/Element <div> not closed/);
+        expect(() => XMLParser.Parse("<div>", "file.mpts")).to.throw(/file\.mpts:1:5/);
     });
 
     it('bad order of close', async () => {
-        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
-        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <span>/);
-        expect(()=>XMLParser.Parse("<span><strong></span></strong>")).to.throw(/1:14/);
+        expect(() => XMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
+        expect(() => XMLParser.Parse("<span><strong></span></strong>")).to.throw(/Last opened element is not <span> but <strong>/);
+        expect(() => XMLParser.Parse("<span><strong></span></strong>", "file.mpts")).to.throw(/file\.mpts:1:14/);
     });
 
     describe('cases from real life', () => {
@@ -54,5 +54,11 @@ describe('XMLParser', () => {
 
         });
     });
-
-})
+    it('ignore XmlDeclaration', () => {
+        const obj = XMLParser.Parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><div></div>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children.length).to.be.equal(1);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equal("div");
+    });
+});

@@ -36,8 +36,14 @@ export function UniParserTest(parser){
     });
 
     it('not opened element', async () => {
+        expect(()=>parser.Parse("<section></div>")).to.throw(MptsParserError);
+        expect(()=>parser.Parse("<section></div>")).to.throw(/Last opened element is not <div> but <section>/);
+        expect(()=>parser.Parse("<section></div>")).to.throw(/1:9/);
+    });
+
+    it('not opened element2', async () => {
         expect(()=>parser.Parse("</div>")).to.throw(MptsParserError);
-        expect(()=>parser.Parse("</div>")).to.throw(/Last opened element is not <div>/);
+        expect(()=>parser.Parse("</div>")).to.throw(/There is no opened elements, <div> closed/);
         expect(()=>parser.Parse("</div>")).to.throw(/1:0/);
     });
 
@@ -86,6 +92,11 @@ export function UniParserTest(parser){
         expect(obj.children[0].attributes[2].expression.source).to.be.instanceOf(TEVariable);
         expect(obj.children[0].attributes[2].expression.source.name).to.be.equal("getClass");
     });
+    it('element with syntax error in attribute', async () => {
+      expect(()=>parser.Parse("<img src=.value/>")).to.throw(MptsParserError);
+      expect(()=>parser.Parse("<img src=.value/>")).to.throw(/source object expected before dot/);
+      expect(()=>parser.Parse("<img src=.value/>", "file.mpts")).to.throw(/file\.mpts:1:9/);
+    })
 
     it('element with boolean atributes', async () => {
         const obj = parser.Parse("<textarea required/>");
@@ -103,6 +114,7 @@ export function UniParserTest(parser){
         expect(obj.children[0]).to.be.instanceOf(TComment);
         expect(obj.children[0].text).to.be.equals("comment");
     });
+
     it('2 comments', async () => {
         const obj = parser.Parse("<!--comment1--><!--comment2-->");
         expect(obj).to.be.instanceOf(TDocumentFragment);
@@ -178,10 +190,71 @@ export function UniParserTest(parser){
         expect(obj.children[0].children[0]).to.be.instanceOf(TForeach);
     });
 
+    it('complex expression in attribute', async () => {
+        const obj = parser.Parse('<div data-value=(a + b * c)></div>');
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+        const attr = obj.children[0].attributes[0];
+        expect(attr.name).to.be.equal("data-value");
+    });
+
+    it('nested loops', async () => {
+        const obj = parser.Parse('<:loop count=2><:loop count=3>test</:loop></:loop>');
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TLoop);
+        expect(obj.children[0].children[0]).to.be.instanceOf(TLoop);
+        expect(obj.children[0].children[0].children[0]).to.be.instanceOf(TText);
+        expect(obj.children[0].count.value).to.be.equal(2);
+        expect(obj.children[0].children[0].count.value).to.be.equal(3);
+    });
+
+    it('nested conditions', async () => {
+        const obj = parser.Parse('<:if condition=true><:if condition=false>test</:if></:if>');
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].expression.value).to.be.equal(true);
+        expect(obj.children[0].conditions[0].children[0].conditions[0].expression.value).to.be.equal(false);
+    });
+
     it('comment after element', async () => {
         const obj = parser.Parse("<tr data-amount=article.amount><!--comment--></tr>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
         expect(obj.children[0].children[0]).to.be.instanceOf(TComment);
     });
+
+    it('comment with special characters', async () => {
+        const obj = parser.Parse("<!-- comment with < > & \" ' -->");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TComment);
+        expect(obj.children[0].text).to.be.equals(" comment with < > & \" ' ");
+    });
+
+    it('attribute with single quotes', async () => {
+        const obj = parser.Parse("<div attr='value'></div>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        const attr = obj.children[0].attributes[0];
+        expect(attr).to.be.instanceOf(TAttribute);
+        expect(attr.name).to.be.equals("attr");
+        expect(attr.expression).to.be.instanceOf(TEString);
+        expect(attr.expression.value).to.be.equal("value");
+    });
+
+    it('DTD html5', async () => {
+        const obj = parser.Parse("<!DOCTYPE html>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TDocumentType)
+        expect(obj.children[0].text).to.be.equal('html');
+    });
+
+    it('DTD custom', async ()=>{
+        const obj = parser.Parse("<!DOCTYPE PUBLIC SYSTEM \"file.dtd\">");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TDocumentType)
+        expect(obj.children[0].text).to.be.equal('PUBLIC SYSTEM "file.dtd"');
+    })
+
 }
