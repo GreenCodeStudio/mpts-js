@@ -43,7 +43,7 @@ export function UniParserTest(parser){
 
     it('not opened element2', async () => {
         expect(()=>parser.Parse("</div>")).to.throw(MptsParserError);
-        expect(()=>parser.Parse("</div>")).to.throw(/There is no opened elements, <div> closed/);
+        expect(()=>parser.Parse("</div>")).to.throw(/There is no opened element, <div> closed/);
         expect(()=>parser.Parse("</div>")).to.throw(/1:0/);
     });
 

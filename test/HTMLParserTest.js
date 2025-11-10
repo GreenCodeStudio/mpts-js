@@ -19,7 +19,7 @@ describe('HTMLParser', () => {
 
     it('bad order of close', async () => {
         expect(() => HTMLParser.Parse("<span><strong></span></strong>")).to.throw(MptsParserError);
-        expect(() => HTMLParser.Parse("<span><strong></span></strong>")).to.throw(/There is no opened elements, <strong> closed/);
+        expect(() => HTMLParser.Parse("<span><strong></span></strong>")).to.throw(/There is no opened element, <strong> closed/);
         expect(() => HTMLParser.Parse("<span><strong></span></strong>", "file.mpts")).to.throw(/file.mpts:0:11/);
     });
     describe('auto closing tags', async () => {
