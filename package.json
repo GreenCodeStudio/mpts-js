@@ -11,7 +11,7 @@
   "repository": "https://github.com/GreenCodeStudio/mpts-js",
   "author": "GreenCodeStudio",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "types": "types/index.d.ts",
   "scripts": {
     "test": "mocha test test/Expression",

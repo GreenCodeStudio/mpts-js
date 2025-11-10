@@ -38,6 +38,10 @@ export class AbstractMLParser extends AbstractParser {
                     let text = this.readUntilText('-->');
                     this.position += 3;
                     element.children.push(new TComment(text))
+                } else if (this.text.substr(this.position, 5) == '<?xml') {
+                    this.position += 5;
+                    let text = this.readUntilText('?>');
+                    this.position += 2;
                 } else if (this.text[this.position + 1] == '/') {
                     this.position += 2;
                     let name = this.parseElementEnd();

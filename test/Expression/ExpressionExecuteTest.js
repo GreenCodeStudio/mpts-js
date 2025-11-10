@@ -155,5 +155,59 @@ describe('ExpressionTest', () => {
             env.variables.var1 = {property:'val'};
             expect(obj.execute(env)).to.be.equal("val")
         });
+
+        it('and', async () => {
+            const obj = ExpressionParser.Parse('a && b');
+
+            const env = new Environment();
+            env.variables.a = true;
+            env.variables.b = false;
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.b = true;
+            expect(obj.execute(env)).to.be.equal(true)
+        });
+
+        it('or', async () => {
+            const obj = ExpressionParser.Parse('a || b');
+
+            const env = new Environment();
+            env.variables.a = false;
+            env.variables.b = false;
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.b = true;
+            expect(obj.execute(env)).to.be.equal(true)
+        });
+
+        it('not', async () => {
+            const obj = ExpressionParser.Parse('!a');
+
+            const env = new Environment();
+            env.variables.a = false;
+            expect(obj.execute(env)).to.be.equal(true)
+            env.variables.a = true;
+            expect(obj.execute(env)).to.be.equal(false)
+        });
+
+        it('double not', async () => {
+            const obj = ExpressionParser.Parse('!!a');
+
+            const env = new Environment();
+            env.variables.a = false;
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.a = true;
+            expect(obj.execute(env)).to.be.equal(true)
+            env.variables.a = 'text';
+            expect(obj.execute(env)).to.be.equal(true)
+            env.variables.a = '';
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.a = 'false';
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.a = 'faLsE';
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.a = 0;
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.a = 1;
+            expect(obj.execute(env)).to.be.equal(true)
+        });
     });
 });
