@@ -63,6 +63,11 @@ describe('ExpressionTest', () => {
             expect(obj).to.be.instanceOf(TEString)
             expect(obj.value).to.be.equal("text")
         });
+        it('string3', async () => {
+            const obj = ExpressionParser.Parse('"&#x63;&#100;"');
+            expect(obj).to.be.instanceOf(TEString)
+            expect(obj.value).to.be.equal("cd")
+        });
         it('equal', async () => {
             const obj = ExpressionParser.Parse('a==b');
 

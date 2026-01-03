@@ -2,6 +2,7 @@ import {expect} from "chai";
 import {Environment} from "../../src/Environment.js";
 
 import {ExpressionParser} from "../../src/parser/ExpressionParser.js";
+import {XMLParser} from "../../src/index.js";
 
 
 describe('ExpressionTest', () => {
@@ -208,6 +209,49 @@ describe('ExpressionTest', () => {
             expect(obj.execute(env)).to.be.equal(false)
             env.variables.a = 1;
             expect(obj.execute(env)).to.be.equal(true)
+        });
+        it('not existing variable', async () => {
+            const obj = ExpressionParser.Parse("notExisting");
+            const env = new Environment();
+            const result = obj.execute(env);
+            expect(result.textContent).to.be.equal(null);
+        })
+        it('not existing property', async () => {
+            const obj = ExpressionParser.Parse("a.b.c");
+            const env = new Environment();
+            env.document = document;
+            env.variables.a = {};
+            const result = obj.execute(env);
+            expect(result.textContent).to.be.equal(null);
+        });
+        it('bad type method call', async () => {
+            const obj = ExpressionParser.Parse("a.b()");
+            const env = new Environment();
+            env.document = document;
+            env.variables.a = {};
+            expect(() => obj.execute(env)).to.throw(Error);
+            expect(() => obj.execute(env)).to.throw(/method call on non method/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:0:2/);
+        });
+        it('not existing method call', async () => {
+            const obj = ExpressionParser.Parse("a.c()");
+            const env = new Environment();
+            env.document = document;
+            env.variables.a = {b: {}};
+            expect(() => obj.execute(env)).to.throw(Error);
+            expect(() => obj.execute(env)).to.throw(/method call on non method/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:0:2/);
+        });
+        it('exception inside method call', async () => {
+            const obj = ExpressionParser.Parse("a()");
+            const env = new Environment();
+            env.document = document;
+            env.variables.a = () => {
+                throw new Error("inside method error")
+            };
+            expect(() => obj.execute(env)).to.throw(Error);
+            expect(() => obj.execute(env)).to.throw(/inside method error/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:0:0/);
         });
     });
 });

@@ -6,6 +6,8 @@ import {Environment} from "../src/Environment.js";
 import {expect} from "chai";
 
 import {JSDOM} from "jsdom";
+import {HTMLParser} from "../src/parser/HTMLParser.js";
+import {MptsParserError} from "../src/parser/MptsParserError.js";
 
 const {document} = (new JSDOM(`...`)).window;
 
@@ -136,7 +138,7 @@ describe('Execution', () => {
         const obj = XMLParser.Parse("<:foreach collection=a>b</:foreach>");
         const env = new Environment();
         env.document = document;
-        env.variables.a = [1,2,3,4,5];
+        env.variables.a = [1, 2, 3, 4, 5];
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("bbbbb");
     })
@@ -145,7 +147,7 @@ describe('Execution', () => {
         const obj = XMLParser.Parse("<:foreach collection=a item=b key=c><div>{{c}}:{{b}}</div></:foreach>");
         const env = new Environment();
         env.document = document;
-        env.variables.a = ['a','b','c','d','e'];
+        env.variables.a = ['a', 'b', 'c', 'd', 'e'];
         const result = obj.execute(env);
         expect(fragmentToHtml(result)).to.be.equal("<div>0:a</div><div>1:b</div><div>2:c</div><div>3:d</div><div>4:e</div>");
     })
@@ -154,7 +156,7 @@ describe('Execution', () => {
         const obj = XMLParser.Parse("<:foreach collection=a><:if condition=false>A</:if></:foreach>");
         const env = new Environment();
         env.document = document;
-        env.variables.a = [1,2,3,4,5];
+        env.variables.a = [1, 2, 3, 4, 5];
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("");
     })
@@ -175,5 +177,25 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.children[0].disabled).to.be.equal(true);
         expect(result.children[1].disabled).to.be.equal(false);
+    });
+    it('not existing variable', async () => {
+        const obj = XMLParser.Parse("{{notExisting}}");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("");
+    })
+    it('exception inside expression', async () => {
+        const obj = XMLParser.Parse("{{a.b()}}");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = {
+            b: () => {
+                throw new Error("inside method error")
+            }
+        };
+        expect(() => obj.execute(env)).to.throw(Error);
+        expect(() => obj.execute(env)).to.throw(/inside method error/);
+        expect(() => obj.execute(env)).to.throw(/file.mpts:0:4/);
     });
 })
