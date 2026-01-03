@@ -42,6 +42,10 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
           var text = _this.readUntilText('-->');
           _this.position += 3;
           element.children.push(new _TComment.TComment(text));
+        } else if (_this.text.substr(_this.position, 5) == '<?xml') {
+          _this.position += 5;
+          var _text = _this.readUntilText('?>');
+          _this.position += 2;
         } else if (_this.text[_this.position + 1] == '/') {
           _this.position += 2;
           var name = _this.parseElementEnd();
@@ -56,7 +60,7 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
             _this.openElements.reverse();
           } else {
             _this.position = positionCopy;
-            _this.throw("Last opened element is not <".concat(name, ">"));
+            _this.throw("Last opened element is not <".concat(name, "> ").concat(element.tagName ? "but <".concat(element.tagName, ">") : ''));
           }
         } else {
           _this.position++;

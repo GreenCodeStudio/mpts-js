@@ -11,17 +11,31 @@ function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = 
 class TEProperty extends _TEExpression.TEExpression {
   constructor(source) {
     var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+    var orNull = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     super();
     _defineProperty(this, "source", "");
     _defineProperty(this, "name", "");
+    _defineProperty(this, "orNull", false);
     this.source = source;
     this.name = name;
+    this.orNull = orNull;
   }
   execute(env) {
-    var _parent;
-    var parent = this.source.execute(env);
-    if (env.allowUndefined) parent = (_parent = parent) !== null && _parent !== void 0 ? _parent : {};
-    return parent[this.name];
+    var clonedEnv = env.scope();
+    var parent = this.source.execute(clonedEnv);
+    if (this.orNull || clonedEnv.allowUndefined) {
+      env.allowUndefined = true;
+    }
+    if (env.allowUndefined) {
+      var _parent, _parent$this$name;
+      parent = (_parent = parent) !== null && _parent !== void 0 ? _parent : {};
+      return (_parent$this$name = parent[this.name]) !== null && _parent$this$name !== void 0 ? _parent$this$name : null;
+    } else {
+      if (parent === null || parent === undefined || !(this.name in parent)) {
+        this.throw("Undefined property: ".concat(this.name));
+      }
+      return parent[this.name];
+    }
   }
   compileJS() {
     var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();

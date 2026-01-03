@@ -14,33 +14,56 @@ import {TEOrNull} from "../nodes/expressions/TEOrNull.js";
 import {TEMultiply} from "../nodes/expressions/TEMultiply.js";
 import {TEDivide} from "../nodes/expressions/TEDivide.js";
 import {TEModulo} from "../nodes/expressions/TEModulo.js";
+import {TEComparsion} from "../nodes/expressions/TEComparsion.js";
+import {decode as decodeHtmlEntities} from "html-entities";
+import {TEAnd} from "../nodes/expressions/TEAnd.js";
+import {TENegate} from "../nodes/expressions/TENegate.js";
+import {TEOr} from "../nodes/expressions/TEOr.js";
 
 export class ExpressionParser extends AbstractParser {
-    constructor(text) {
+    constructor(text,
+                fileName = null,
+                filePositionOffset = null,
+                fileLineOffset = null,
+                fileColumnOffset = null
+    ) {
         super();
         this.text = text;
         this.position = 0;
+        this.filePositionOffset = filePositionOffset;
+        this.fileLineOffset = fileLineOffset;
+        this.fileColumnOffset = fileColumnOffset;
+        this.fileName = fileName;
     }
 
-    static Parse(text, endLevel = 0) {
-        return (new ExpressionParser(text)).parseNormal(endLevel);
+    static Parse(text, codePosition = null) {
+        return (new ExpressionParser(text,
+            codePosition?.fileName,
+            codePosition?.fileOffset,
+            codePosition?.lineNumber,
+            codePosition?.columnNumber
+        )).parseNormal();
     }
 
     parseNormal(endLevel = 0) {
         let lastNode = null;
         while (this.position < this.text.length) {
             const char = this.text[this.position];
-            // const partCodePosition=this.currentCodePosition;
+            const partCodePosition = this.currentCodePosition;
             if (/\s/.test(char)) {
                 this.position++;
-            } else if (lastNode && char == '.') {
-                this.position++;
+            } else if (lastNode && char == '?' && this.text[this.position + 1] == '.') {
+                this.position += 2;
+                const partCodePosition = this.currentCodePosition;
                 let name = this.readUntil(/['"\(\)=\.:\s>+\-*?]/);
                 lastNode = new TEProperty(lastNode, name, true);
-            } else if (lastNode && char == '?' && this.text[this.position + 1] == '.') {
+                lastNode.codePosition = partCodePosition;
+            } else if (lastNode && char == '.') {
                 this.position++;
+                const partCodePosition = this.currentCodePosition;
                 let name = this.readUntil(/['"\(\)=\.:\s>+\-*?]/);
-                lastNode = new TEProperty(lastNode, name);
+                lastNode = new TEProperty(lastNode, name, false);
+                lastNode.codePosition = partCodePosition;
             } else if (/[0-9\.]/.test(char)) {
                 this.position++;
                 let value = char + this.readUntil(/[^0-9\.e]/);
@@ -53,15 +76,16 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
                 let value = this.readUntil(/"/);
                 this.position++;
-                lastNode = new TEString(value);
+                lastNode = new TEString(decodeHtmlEntities(value));
             } else if (char == "'") {
                 this.position++;
                 let value = this.readUntil(/'/);
                 this.position++;
-                lastNode = new TEString(value);
+                lastNode = new TEString(decodeHtmlEntities(value));
             } else if (char == "(") {
                 if (lastNode) {
                     lastNode = new TEMethodCall(lastNode);
+                    lastNode.codePosition = partCodePosition;
                     this.position++;
                     this.skipWhitespace();
                     while (this.text[this.position] != ')') {
@@ -76,7 +100,6 @@ export class ExpressionParser extends AbstractParser {
                 } else {
                     this.position++;
                     let value = this.parseNormal(10);
-                    this.position++;
                     lastNode = value;
                 }
             } else if (char == ")") {
@@ -120,15 +143,14 @@ export class ExpressionParser extends AbstractParser {
                 this.position += 2;
                 let right = this.parseNormal(20);
                 lastNode = new TEOr(lastNode, right);
-            }
-            else if (char == "?" && this.text[this.position + 1] == "?") {
+            } else if (char == "?" && this.text[this.position + 1] == "?") {
                 if (endLevel >= 20) {
                     break;
                 }
                 this.position += 2;
                 let right = this.parseNormal(20);
                 lastNode = new TEOrNull(lastNode, right);
-            }else if (char == "+") {
+            } else if (char == "+") {
                 if (endLevel >= 60) {
                     break;
                 }
@@ -164,7 +186,7 @@ export class ExpressionParser extends AbstractParser {
                 let right = this.parseNormal(70);
                 lastNode = new TEModulo(lastNode, right);
             } else if (char == "!") {
-                if (endLevel >= 30) {
+                if (endLevel > 30) {
                     break;
                 }
                 if (lastNode) {
@@ -185,31 +207,29 @@ export class ExpressionParser extends AbstractParser {
                         this.throw("Unexpected character")
                     }
                 } else {//in parenthesis
-                    if(endLevel>=40){
+                    if (endLevel >= 40) {
                         break;
                     }
                     this.position++;
-                    let orEqual=this.text[this.position]=="=";
-                    if(orEqual){
+                    let orEqual = this.text[this.position] == "=";
+                    if (orEqual) {
                         this.position++;
                     }
                     let right = this.parseNormal(40);
-                    lastNode=new TEComparsion(lastNode, right,true, orEqual)
+                    lastNode = new TEComparsion(lastNode, right, true, orEqual)
                 }
-            }else if(char=="<"){
-                if (endLevel >=40) {
+            } else if (char == "<") {
+                if (endLevel >= 40) {
                     break;
                 }
                 this.position++;
-                let orEqual=this.text[this.position]=="=";
-                if(orEqual){
+                let orEqual = this.text[this.position] == "=";
+                if (orEqual) {
                     this.position++;
                 }
                 let right = this.parseNormal(40);
-                lastNode=new TEComparsion(lastNode, right,false, orEqual)
-            }
-
-            else {
+                lastNode = new TEComparsion(lastNode, right, false, orEqual)
+            } else {
                 if (lastNode) {
                     break;
                 }
@@ -219,10 +239,11 @@ export class ExpressionParser extends AbstractParser {
                 else if (name == 'false')
                     lastNode = new TEBoolean(false)
                 else
-                    lastNode = new TEVariable(name);
+                    lastNode = new TEVariable(name, partCodePosition);
             }
         }
         return lastNode;
     }
+
 
 }

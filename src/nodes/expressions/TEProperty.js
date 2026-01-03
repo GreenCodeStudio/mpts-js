@@ -13,10 +13,20 @@ export class TEProperty extends TEExpression {
     }
 
     execute(env) {
-        let parent = this.source.execute(env);
-        if (env.allowUndefined)
+        let clonedEnv = env.scope();
+        let parent = this.source.execute(clonedEnv);
+        if (this.orNull || clonedEnv.allowUndefined) {
+            env.allowUndefined = true;
+        }
+        if (env.allowUndefined) {
             parent = parent ?? {}
-        return parent[this.name];
+            return parent[this.name] ?? null;
+        } else {
+            if (parent === null || parent === undefined || !(this.name in parent)) {
+                this.throw(`Undefined property: ${this.name}`);
+            }
+            return parent[this.name];
+        }
     }
 
     compileJS(scopedVariables = new Set()) {

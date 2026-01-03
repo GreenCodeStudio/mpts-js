@@ -5,13 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MptsParserError = void 0;
 class MptsParserError extends Error {
-  constructor(message, line, column, sample, totalPosition) {
-    super(message + '\r\n' + sample.replace(/\n/g, '\\n') + '\r\n' + line + ":" + column);
-    this.messageRaw = message;
-    this.line = line;
-    this.column = column;
+  constructor(message, codePosition, sample) {
+    super("Parse error: ".concat(message, "\n\nCode:\n").concat(sample.replace(/\n/g, '\\n'), "\n\nFile: ").concat(codePosition));
+    this.codePosition = codePosition;
     this.sample = sample;
-    this.totalPosition = totalPosition;
   }
 }
 exports.MptsParserError = MptsParserError;

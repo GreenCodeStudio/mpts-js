@@ -11,12 +11,23 @@ function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = 
 class TEVariable extends _TEExpression.TEExpression {
   constructor() {
     var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    var codePosition = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     super();
     _defineProperty(this, "name", "");
     this.name = name;
+    this.codePosition = codePosition;
   }
   execute(env) {
-    return env.variables[this.name];
+    if (env.allowUndefined) {
+      var _env$variables$this$n;
+      return (_env$variables$this$n = env.variables[this.name]) !== null && _env$variables$this$n !== void 0 ? _env$variables$this$n : null;
+    } else {
+      if (this.name in env.variables) {
+        return env.variables[this.name];
+      } else {
+        this.throw("Undefined variable: " + this.name);
+      }
+    }
   }
   compileJS() {
     var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();

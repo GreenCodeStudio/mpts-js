@@ -1,27 +1,20 @@
 import {TEExpression} from "./TEExpression.js";
 
-export class TEOrNull extends TEExpression {
+export class TEAnd extends TEExpression {
     constructor(left, right) {
         super();
         this.left = left;
         this.right = right;
     }
     execute(env) {
-        let subEnv=env.scope();
-        subEnv.allowUndefined=true;
-        let left=this.left.execute(subEnv)
-        if (left != null) {
-            return left;
-        } else {
-            return this.right.execute(env);
-        }
+        return (this.left.execute(env)) && (this.right.execute(env));
     }
     compileJS(scopedVariables = new Set()) {
-        let code='(';
+        let code="((";
         code+=this.left.compileJS(scopedVariables).code;
-        code+='??';
+        code+=')&&(';
         code+=this.right.compileJS(scopedVariables).code;
-        code+=')';
+        code+='))';
         return {code};
     }
 }

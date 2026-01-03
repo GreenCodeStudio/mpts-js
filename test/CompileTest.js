@@ -46,7 +46,7 @@ describe('Compile', () => {
     });
 
     it('element with attributes', async () => {
-        const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e)></div>");
+        const obj = XMLParser.Parse("<div a=\"1\" b='2' c=3 d=d e=(e) ></div>");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
         let variables = {d: 4, e: 5}
@@ -108,12 +108,12 @@ describe('Compile', () => {
         expect(fragmentToHtml(result)).to.be.equal("cd");
     })
     it('attribute concat', async () => {
-        const obj = XMLParser.Parse("<div ab=\"cd\":x:\"gh\"/>");
+        const obj = XMLParser.Parse("<div ab=\"cd\":x:\"gh\" />");
         const compiled = obj.compileJS();
         const document = (new JSDOM(`...`)).window.document;
         let variables = {x: 'ef'}
         const result = eval(compiled.code + compiled.rootName);
-        expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\"></div>");
+        expect(fragmentToHtml(result)).to.be.equal("<div ab=\"cdefgh\" ></div>");
     });
     it('disabled', async () => {
         const obj = XMLParser.Parse("<input disabled=(a==1) /><input disabled=(a==2) />");

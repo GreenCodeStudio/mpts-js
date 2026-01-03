@@ -10,6 +10,7 @@ function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = 
 class Environment {
   constructor() {
     _defineProperty(this, "allowExecution", false);
+    _defineProperty(this, "allowUndefined", false);
     _defineProperty(this, "variables", {});
     _defineProperty(this, "document", global.document);
   }
@@ -17,6 +18,7 @@ class Environment {
     var newVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var ret = new Environment();
     ret.allowExecution = this.allowExecution;
+    ret.allowUndefined = this.allowUndefined;
     ret.variables = Object.create(this.variables);
     ret.document = this.document;
     Object.assign(ret.variables, newVariables);
