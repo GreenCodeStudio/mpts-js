@@ -213,12 +213,40 @@ describe('ExpressionTest', () => {
         it('not existing variable', async () => {
             const obj = ExpressionParser.Parse("notExisting");
             const env = new Environment();
+            env.allowUndefined=false;
+            expect(() => obj.execute(env)).to.throw(Error);
+            expect(() => obj.execute(env)).to.throw(/variable `notExisting` don\'t exists/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:1:0/);
+        })
+        it('not existing variable allow undefined', async () => {
+            const obj = ExpressionParser.Parse("notExisting");
+            const env = new Environment();
+            env.allowUndefined=true;
             const result = obj.execute(env);
             expect(result.textContent).to.be.equal(null);
         })
         it('not existing property', async () => {
             const obj = ExpressionParser.Parse("a.b.c");
             const env = new Environment();
+            env.document = document;
+            env.variables.a = {};
+            expect(() => obj.execute(env)).to.throw(Error);
+            expect(() => obj.execute(env)).to.throw(/property `b` don\'t exists/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:1:2/);
+        });
+
+        it('not existing property allow undefined', async () => {
+            const obj = ExpressionParser.Parse("a.b.c");
+            const env = new Environment();
+            env.document = document;
+            env.variables.a = {};
+            const result = obj.execute(env);
+            expect(result.textContent).to.be.equal(null);
+        });
+        it('test not existing property nullable operator', async () => {
+            const obj = ExpressionParser.Parse("a?.b.c");
+            const env = new Environment();
+            env.allowUndefined = false;
             env.document = document;
             env.variables.a = {};
             const result = obj.execute(env);
@@ -231,7 +259,7 @@ describe('ExpressionTest', () => {
             env.variables.a = {};
             expect(() => obj.execute(env)).to.throw(Error);
             expect(() => obj.execute(env)).to.throw(/method call on non method/);
-            expect(() => obj.execute(env)).to.throw(/file.mpts:0:2/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:1:2/);
         });
         it('not existing method call', async () => {
             const obj = ExpressionParser.Parse("a.c()");
@@ -239,8 +267,8 @@ describe('ExpressionTest', () => {
             env.document = document;
             env.variables.a = {b: {}};
             expect(() => obj.execute(env)).to.throw(Error);
-            expect(() => obj.execute(env)).to.throw(/method call on non method/);
-            expect(() => obj.execute(env)).to.throw(/file.mpts:0:2/);
+            expect(() => obj.execute(env)).to.throw(/method don\'t exists/);
+            expect(() => obj.execute(env)).to.throw(/file.mpts:1:3/);
         });
         it('exception inside method call', async () => {
             const obj = ExpressionParser.Parse("a()");
@@ -251,7 +279,7 @@ describe('ExpressionTest', () => {
             };
             expect(() => obj.execute(env)).to.throw(Error);
             expect(() => obj.execute(env)).to.throw(/inside method error/);
-            expect(() => obj.execute(env)).to.throw(/file.mpts:0:0/);
+            expect(() => obj.execute(env)).to.throw(/file\.mpts:1:1/);
         });
     });
 });

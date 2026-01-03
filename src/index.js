@@ -1,2 +1,2 @@
-export {Environment} from "./Environment";
-export {XMLParser} from "./parser/XMLParser";
+export {Environment} from "./Environment.js";
+export {XMLParser} from "./parser/XMLParser.js";

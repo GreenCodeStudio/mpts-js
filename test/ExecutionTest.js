@@ -183,7 +183,9 @@ describe('Execution', () => {
         const env = new Environment();
         env.document = document;
         const result = obj.execute(env);
-        expect(result.textContent).to.be.equal("");
+        expect(() => obj.execute(env)).to.throw(Error);
+        expect(() => obj.execute(env)).to.throw(/variable `notExisting` don\'t exists/);
+        expect(() => obj.execute(env)).to.throw(/file\.mpts:1:2/);
     })
     it('exception inside expression', async () => {
         const obj = XMLParser.Parse("{{a.b()}}");
@@ -196,6 +198,6 @@ describe('Execution', () => {
         };
         expect(() => obj.execute(env)).to.throw(Error);
         expect(() => obj.execute(env)).to.throw(/inside method error/);
-        expect(() => obj.execute(env)).to.throw(/file.mpts:0:4/);
+        expect(() => obj.execute(env)).to.throw(/file\.mpts:1:5/);
     });
 })
