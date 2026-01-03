@@ -133,6 +133,35 @@ describe('ExpressionTest', () => {
             const env = new Environment();
             expect(obj.execute(env)).to.be.equal(-6)
         });
+        it('multiply', async () => {
+            const obj = ExpressionParser.Parse("2*5 * 3");
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(30);
+        });
+
+        it('divide', async () => {
+            const obj = ExpressionParser.Parse("20/5 / 2");
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(2);
+        });
+
+        it('precedence', async () => {
+            const obj = ExpressionParser.Parse("2+5 * 3");
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(17);
+        });
+
+        it('parenthesis', async () => {
+            const obj = ExpressionParser.Parse("(2+5) * 3");
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(21);
+        });
+
+        it('modulo', async () => {
+            const obj = ExpressionParser.Parse("20 % 6");
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal(2);
+        });
 
         it('orNull', async () => {
             const obj = ExpressionParser.Parse('var1??"empty"');
