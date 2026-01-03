@@ -3,11 +3,13 @@ import {TEExpression} from "./TEExpression.js";
 export class TEProperty extends TEExpression {
     source = "";
     name = "";
+    orNull = false;
 
-    constructor(source, name = "") {
+    constructor(source, name = "", orNull = false) {
         super();
         this.source = source;
         this.name = name;
+        this.orNull = orNull;
     }
 
     execute(env) {

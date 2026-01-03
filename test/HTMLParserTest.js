@@ -41,6 +41,7 @@ describe('HTMLParser', () => {
         ];
         for (const tag of tags) {
             it('auto closing <' + tag + '>', async () => {
+                //randomize case for purporse
                 const tagCase = tag.split().map(c => Math.random() > 0.5 ? c.toUpperCase() : c.toLowerCase()).join('');
 
                 const obj = HTMLParser.Parse("<" + tagCase + ">after");
@@ -48,7 +49,7 @@ describe('HTMLParser', () => {
                 expect(obj.children[0]).to.be.instanceOf(TElement);
                 expect(obj.children[0].tagName).to.be.equal(tagCase);
                 expect(obj.children[1]).to.be.instanceOf(TText);
-                expect(obj.children[1].text).to.be.equal(after);
+                expect(obj.children[1].text).to.be.equal('after');
             });
         }
     });

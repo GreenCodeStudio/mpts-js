@@ -184,7 +184,7 @@ describe('Execution', () => {
         env.document = document;
         const result = obj.execute(env);
         expect(() => obj.execute(env)).to.throw(Error);
-        expect(() => obj.execute(env)).to.throw(/variable `notExisting` don\'t exists/);
+        expect(() => obj.execute(env)).to.throw(/undefined variable: notExisting/);
         expect(() => obj.execute(env)).to.throw(/file\.mpts:1:2/);
     })
     it('exception inside expression', async () => {

@@ -244,7 +244,7 @@ describe('ExpressionTest', () => {
             const env = new Environment();
             env.allowUndefined=false;
             expect(() => obj.execute(env)).to.throw(Error);
-            expect(() => obj.execute(env)).to.throw(/variable `notExisting` don\'t exists/);
+            expect(() => obj.execute(env)).to.throw(/Undefined variable: notExisting/);
             expect(() => obj.execute(env)).to.throw(/file.mpts:1:0/);
         })
         it('not existing variable allow undefined', async () => {
@@ -260,7 +260,7 @@ describe('ExpressionTest', () => {
             env.document = document;
             env.variables.a = {};
             expect(() => obj.execute(env)).to.throw(Error);
-            expect(() => obj.execute(env)).to.throw(/property `b` don\'t exists/);
+            expect(() => obj.execute(env)).to.throw(/undefined property: b/);
             expect(() => obj.execute(env)).to.throw(/file.mpts:1:2/);
         });
 
