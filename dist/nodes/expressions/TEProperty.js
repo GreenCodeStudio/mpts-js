@@ -26,7 +26,7 @@ export class TEProperty extends TEExpression {
     }
   }
   compileJS(scopedVariables = new Set()) {
-    let code = this.source.compileJS(scopedVariables).code + '[' + JSON.stringify(this.name) + ']';
+    let code = this.source.compileJS(scopedVariables).code + (this.orNull ? '?.' : '') + '[' + JSON.stringify(this.name) + ']';
     return {
       code
     };
