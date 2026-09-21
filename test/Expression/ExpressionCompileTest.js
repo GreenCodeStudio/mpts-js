@@ -64,5 +64,9 @@ describe('ExpressionTest', () => {
             const obj = ExpressionParser.Parse('a("b")');
             expect(obj.compileJS().code).to.be.equal('variables[\"a\"]("b")')
         });
+        it('test not existing property nullable operator', async () => {
+            const obj = ExpressionParser.Parse('a?.b');
+            expect(obj.compileJS().code).to.be.equal('variables[\"a\"]?.[\"b\"]')
+        });
     });
 });
