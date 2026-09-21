@@ -186,7 +186,32 @@ describe('Execution', () => {
         expect(() => obj.execute(env)).to.throw(Error);
         expect(() => obj.execute(env)).to.throw(/undefined variable: notExisting/);
         expect(() => obj.execute(env)).to.throw(/file\.mpts:1:2/);
-    })
+    });
+    it('not existing property', async () => {
+        const obj = XMLParser.Parse("{{a.b}}");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = {};
+        expect(() => obj.execute(env)).to.throw(Error);
+        expect(() => obj.execute(env)).to.throw(/undefined property: b/);
+        expect(() => obj.execute(env)).to.throw(/file\.mpts:1:5/);
+    });
+    it('not existing property with null coalescing', async () => {
+        const obj = XMLParser.Parse("{{a.b??'default'}}");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = {};
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("default");
+    });
+    it('not existing property with ?.', async () => {
+        const obj = XMLParser.Parse("{{a?.b}}");
+        const env = new Environment();
+        env.document = document;
+        env.variables.a = {};
+        const result = obj.execute(env);
+        expect(result.textContent).to.be.equal("");
+    });
     it('exception inside expression', async () => {
         const obj = XMLParser.Parse("{{a.b()}}");
         const env = new Environment();
