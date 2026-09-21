@@ -1,11 +1,5 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TEModulo = void 0;
-var _TEExpression = require("./TEExpression.js");
-class TEModulo extends _TEExpression.TEExpression {
+import { TEExpression } from "./TEExpression.js";
+export class TEModulo extends TEExpression {
   constructor(left, right) {
     super();
     this.left = left;
@@ -14,9 +8,8 @@ class TEModulo extends _TEExpression.TEExpression {
   execute(env) {
     return this.left.execute(env) % this.right.execute(env);
   }
-  compileJS() {
-    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
-    var code = "(";
+  compileJS(scopedVariables = new Set()) {
+    let code = "(";
     code += this.left.compileJS(scopedVariables).code;
     code += '%';
     code += this.right.compileJS(scopedVariables).code;
@@ -26,4 +19,3 @@ class TEModulo extends _TEExpression.TEExpression {
     };
   }
 }
-exports.TEModulo = TEModulo;

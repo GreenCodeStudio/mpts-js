@@ -1,29 +1,22 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TEOrNull = void 0;
-var _TEExpression = require("./TEExpression.js");
-class TEOrNull extends _TEExpression.TEExpression {
+import { TEExpression } from "./TEExpression.js";
+export class TEOrNull extends TEExpression {
   constructor(left, right) {
     super();
     this.left = left;
     this.right = right;
   }
   execute(env) {
-    var subEnv = env.scope();
+    let subEnv = env.scope();
     subEnv.allowUndefined = true;
-    var left = this.left.execute(subEnv);
+    let left = this.left.execute(subEnv);
     if (left != null) {
       return left;
     } else {
       return this.right.execute(env);
     }
   }
-  compileJS() {
-    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
-    var code = '(';
+  compileJS(scopedVariables = new Set()) {
+    let code = '(';
     code += this.left.compileJS(scopedVariables).code;
     code += '??';
     code += this.right.compileJS(scopedVariables).code;
@@ -33,4 +26,3 @@ class TEOrNull extends _TEExpression.TEExpression {
     };
   }
 }
-exports.TEOrNull = TEOrNull;

@@ -1,11 +1,5 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TEComparsion = void 0;
-var _TEExpression = require("./TEExpression.js");
-class TEComparsion extends _TEExpression.TEExpression {
+import { TEExpression } from "./TEExpression.js";
+export class TEComparsion extends TEExpression {
   constructor(left, right, isGreaterThan, orEqual) {
     super();
     this.left = left;
@@ -14,8 +8,8 @@ class TEComparsion extends _TEExpression.TEExpression {
     this.orEqual = orEqual;
   }
   execute(env) {
-    var l = this.left.execute(env);
-    var r = this.right.execute(env);
+    const l = this.left.execute(env);
+    const r = this.right.execute(env);
     if (this.isGreaterThan) {
       if (this.orEqual) {
         return l >= r;
@@ -30,11 +24,10 @@ class TEComparsion extends _TEExpression.TEExpression {
       }
     }
   }
-  compileJS() {
-    var scopedVariables = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Set();
-    var l = this.left.compileJS(scopedVariables);
-    var r = this.right.compileJS(scopedVariables);
-    var code = "(";
+  compileJS(scopedVariables = new Set()) {
+    const l = this.left.compileJS(scopedVariables);
+    const r = this.right.compileJS(scopedVariables);
+    let code = "(";
     code += l.code;
     if (this.isGreaterThan) {
       code += this.orEqual ? '>=' : '>';
@@ -48,4 +41,3 @@ class TEComparsion extends _TEExpression.TEExpression {
     };
   }
 }
-exports.TEComparsion = TEComparsion;

@@ -1,133 +1,123 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.AbstractMLParser = void 0;
-var _TDocumentFragment = require("../nodes/TDocumentFragment.js");
-var _TText = require("../nodes/TText.js");
-var _TElement = require("../nodes/TElement.js");
-var _TExpressionText = require("../nodes/TExpressionText.js");
-var _TAttribute = require("../nodes/TAttribute.js");
-var _TIf = require("../nodes/TIf.js");
-var _ExpressionParser = require("./ExpressionParser.js");
-var _AbstractParser = require("./AbstractParser.js");
-var _TLoop = require("../nodes/TLoop.js");
-var _TComment = require("../nodes/TComment.js");
-var _TForeach = require("../nodes/TForeach.js");
-var _TExpressionSubnode = require("../nodes/TExpressionSubnode.js");
-class AbstractMLParser extends _AbstractParser.AbstractParser {
+import { TDocumentFragment } from "../nodes/TDocumentFragment.js";
+import { TText } from "../nodes/TText.js";
+import { TElement } from "../nodes/TElement.js";
+import { TExpressionText } from "../nodes/TExpressionText.js";
+import { TAttribute } from "../nodes/TAttribute.js";
+import { TIf } from "../nodes/TIf.js";
+import { ExpressionParser } from "./ExpressionParser.js";
+import { AbstractParser } from "./AbstractParser.js";
+import { TLoop } from "../nodes/TLoop.js";
+import { TComment } from "../nodes/TComment.js";
+import { TForeach } from "../nodes/TForeach.js";
+import { TExpressionSubnode } from "../nodes/TExpressionSubnode.js";
+export class AbstractMLParser extends AbstractParser {
   constructor(text) {
     super();
     this.text = text;
     this.position = 0;
-    this.openElements = [new _TDocumentFragment.TDocumentFragment()];
+    this.openElements = [new TDocumentFragment()];
   }
   parseNormal() {
-    var _this = this;
-    var _loop = function _loop() {
-      var positionCopy = _this.position;
-      var char = _this.text[_this.position];
-      var element = _this.openElements[_this.openElements.length - 1];
-      var last = element.children[element.children.length - 1];
+    while (this.position < this.text.length) {
+      const positionCopy = this.position;
+      const char = this.text[this.position];
+      let element = this.openElements[this.openElements.length - 1];
+      let last = element.children[element.children.length - 1];
       if (char == '<') {
-        if (_this.text.substr(_this.position, 2) == '<<') {
-          _this.position += 2;
-          var result = _this.parseExpression('>>');
-          var node = new _TExpressionSubnode.TExpressionSubnode();
+        if (this.text.substr(this.position, 2) == '<<') {
+          this.position += 2;
+          let result = this.parseExpression('>>');
+          let node = new TExpressionSubnode();
           node.expression = result;
           element.children.push(node);
-        } else if (_this.text.substr(_this.position, 4) == '<!--') {
-          _this.position += 4;
-          var text = _this.readUntilText('-->');
-          _this.position += 3;
-          element.children.push(new _TComment.TComment(text));
-        } else if (_this.text.substr(_this.position, 5) == '<?xml') {
-          _this.position += 5;
-          var _text = _this.readUntilText('?>');
-          _this.position += 2;
-        } else if (_this.text[_this.position + 1] == '/') {
-          _this.position += 2;
-          var name = _this.parseElementEnd();
+        } else if (this.text.substr(this.position, 4) == '<!--') {
+          this.position += 4;
+          let text = this.readUntilText('-->');
+          this.position += 3;
+          element.children.push(new TComment(text));
+        } else if (this.text.substr(this.position, 5) == '<?xml') {
+          this.position += 5;
+          let text = this.readUntilText('?>');
+          this.position += 2;
+        } else if (this.text[this.position + 1] == '/') {
+          this.position += 2;
+          let name = this.parseElementEnd();
           if (name.startsWith(':')) {
-            _this.closeSpecialElement(name, _this.openElements);
-          } else if (element instanceof _TElement.TElement && element.tagName == name) {
-            _this.openElements.pop();
-          } else if (_this.allowAutoClose && _this.openElements.some(e => e instanceof _TElement.TElement && e.tagName == name)) {
-            _this.openElements.reverse();
-            var closing = _this.openElements.find(e => e instanceof _TElement.TElement && e.tagName == name);
-            _this.openElements.splice(0, _this.openElements.indexOf(closing) + 1);
-            _this.openElements.reverse();
+            this.closeSpecialElement(name, this.openElements);
+          } else if (element instanceof TElement && element.tagName == name) {
+            this.openElements.pop();
+          } else if (this.allowAutoClose && this.openElements.some(e => e instanceof TElement && e.tagName == name)) {
+            this.openElements.reverse();
+            const closing = this.openElements.find(e => e instanceof TElement && e.tagName == name);
+            this.openElements.splice(0, this.openElements.indexOf(closing) + 1);
+            this.openElements.reverse();
           } else {
-            _this.position = positionCopy;
-            _this.throw("Last opened element is not <".concat(name, "> ").concat(element.tagName ? "but <".concat(element.tagName, ">") : ''));
+            this.position = positionCopy;
+            this.throw(`Last opened element is not <${name}> ${element.tagName ? `but <${element.tagName}>` : ''}`);
           }
         } else {
-          _this.position++;
-          var _result = _this.parseElement();
-          if (_result.element.tagName.startsWith(':')) {
-            _this.convertToSpecialElement(_result, element);
+          this.position++;
+          let result = this.parseElement();
+          if (result.element.tagName.startsWith(':')) {
+            this.convertToSpecialElement(result, element);
           } else {
-            _this.addElement(_result.element, _result.autoclose);
+            this.addElement(result.element, result.autoclose);
           }
         }
-      } else if (char == '{' && _this.text[_this.position + 1] == '{') {
-        _this.position += 2;
-        var _result2 = _this.parseExpression('}}');
-        var _node = new _TExpressionText.TExpressionText();
-        _node.expression = _result2;
-        element.children.push(_node);
+      } else if (char == '{' && this.text[this.position + 1] == '{') {
+        this.position += 2;
+        let result = this.parseExpression('}}');
+        let node = new TExpressionText();
+        node.expression = result;
+        element.children.push(node);
       } else {
-        if (!last || !(last instanceof _TText.TText)) {
-          last = new _TText.TText();
+        if (!last || !(last instanceof TText)) {
+          last = new TText();
           element.children.push(last);
         }
         last.text += char;
-        _this.position++;
+        this.position++;
       }
-    };
-    while (this.position < this.text.length) {
-      _loop();
     }
     if (this.openElements.length > 1 && !this.allowAutoClose) {
-      this.throw("Element <".concat(this.openElements[this.openElements.length - 1].tagName, "> not closed"));
+      this.throw(`Element <${this.openElements[this.openElements.length - 1].tagName}> not closed`);
     }
     return this.openElements[0];
   }
   parseElement() {
-    var autoclose = false;
-    var element = new _TElement.TElement();
+    let autoclose = false;
+    let element = new TElement();
     element.parsePosition = this.position;
     while (this.position < this.text.length) {
-      var char = this.text[this.position];
+      const char = this.text[this.position];
       if (char == '>' || char == ' ' || char == '/') break;
       element.tagName += char;
       this.position++;
     }
     while (this.position < this.text.length) {
-      var _char = this.text[this.position];
-      if (_char == '>') {
+      let char = this.text[this.position];
+      if (char == '>') {
         this.position++;
         break;
-      } else if (_char == '/') {
+      } else if (char == '/') {
         this.position++;
         autoclose = true;
-      } else if (/\s/.test(_char)) {
+      } else if (/\s/.test(char)) {
         this.position++;
       } else {
-        var name = this.readUntil(/[\s=/]/);
-        var value = null;
+        let name = this.readUntil(/[\s=/]/);
+        let value = null;
         this.skipWhitespace();
-        _char = this.text[this.position];
-        if (_char == '=') {
+        char = this.text[this.position];
+        if (char == '=') {
           this.position++;
           this.skipWhitespace();
-          var char2 = this.text[this.position];
-          var parser = new _ExpressionParser.ExpressionParser(this.text.substring(this.position));
+          const char2 = this.text[this.position];
+          const parser = new ExpressionParser(this.text.substring(this.position));
           value = parser.parseNormal();
           this.position += parser.position;
         }
-        element.attributes.push(new _TAttribute.TAttribute(name, value));
+        element.attributes.push(new TAttribute(name, value));
       }
     }
     return {
@@ -136,16 +126,16 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
     };
   }
   parseElementEnd() {
-    var name = "";
+    let name = "";
     while (this.position < this.text.length) {
-      var char = this.text[this.position];
+      const char = this.text[this.position];
       if (char == '>' || char == ' ' || char == '/') break;
       name += char;
       this.position++;
     }
     while (this.position < this.text.length) {
-      var _char2 = this.text[this.position];
-      if (_char2 == '>') {
+      const char = this.text[this.position];
+      if (char == '>') {
         this.position++;
         break;
       }
@@ -154,7 +144,7 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
     return name;
   }
   parseExpression(end) {
-    var text = "";
+    let text = "";
     while (this.position < this.text.length) {
       if (this.text.substring(this.position, this.position + end.length) == end) {
         this.position += end.length;
@@ -163,12 +153,12 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
       text += this.text[this.position];
       this.position++;
     }
-    return _ExpressionParser.ExpressionParser.Parse(text);
+    return ExpressionParser.Parse(text);
   }
   clearLastWhitespace(element) {
     while (element.children.length > 0) {
-      var last = element.children[element.children.length - 1];
-      if (last instanceof _TText.TText && last.text.trim() == "") {
+      const last = element.children[element.children.length - 1];
+      if (last instanceof TText && last.text.trim() == "") {
         element.children.pop();
       } else {
         break;
@@ -177,8 +167,8 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
   }
   convertToSpecialElement(result, element) {
     if (result.element.tagName.toLowerCase() == ':if') {
-      var node = new _TIf.TIf();
-      var expression = result.element.attributes.find(x => x.name == 'condition').expression;
+      let node = new TIf();
+      const expression = result.element.attributes.find(x => x.name == 'condition').expression;
       node.conditions.push({
         expression,
         children: []
@@ -187,66 +177,65 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
       if (!result.autoclose) this.openElements.push(node);
     } else if (result.element.tagName.toLowerCase() == ':else-if') {
       this.clearLastWhitespace(element);
-      var last = element.children[element.children.length - 1];
-      if (!(last instanceof _TIf.TIf && last.else == null)) this.throw("need if before else-if");
-      var _expression = result.element.attributes.find(x => x.name == 'condition').expression;
+      const last = element.children[element.children.length - 1];
+      if (!(last instanceof TIf && last.else == null)) this.throw("need if before else-if");
+      const expression = result.element.attributes.find(x => x.name == 'condition').expression;
       last.conditions.push({
-        expression: _expression,
+        expression,
         children: []
       });
       if (!result.autoclose) this.openElements.push(last);
     } else if (result.element.tagName.toLowerCase() == ':else') {
       this.clearLastWhitespace(element);
-      var _last = element.children[element.children.length - 1];
-      if (!(_last instanceof _TIf.TIf && _last.else == null)) this.throw("need if before else");
-      _last.else = {
+      const last = element.children[element.children.length - 1];
+      if (!(last instanceof TIf && last.else == null)) this.throw("need if before else");
+      last.else = {
         children: []
       };
-      if (!result.autoclose) this.openElements.push(_last);
+      if (!result.autoclose) this.openElements.push(last);
     } else if (result.element.tagName.toLowerCase() == ':loop') {
-      var count = result.element.attributes.find(x => x.name == 'count').expression;
-      var _node2 = new _TLoop.TLoop(count);
-      element.children.push(_node2);
-      if (!result.autoclose) this.openElements.push(_node2);
+      let count = result.element.attributes.find(x => x.name == 'count').expression;
+      let node = new TLoop(count);
+      element.children.push(node);
+      if (!result.autoclose) this.openElements.push(node);
     } else if (result.element.tagName.toLowerCase() == ':foreach') {
-      var _result$element$attri, _result$element$attri2;
-      var collection = result.element.attributes.find(x => x.name == 'collection').expression;
-      var item = (_result$element$attri = result.element.attributes.find(x => x.name == 'item')) === null || _result$element$attri === void 0 ? void 0 : _result$element$attri.expression.name;
-      var key = (_result$element$attri2 = result.element.attributes.find(x => x.name == 'key')) === null || _result$element$attri2 === void 0 ? void 0 : _result$element$attri2.expression.name;
-      var _node3 = new _TForeach.TForeach(collection, item, key);
-      element.children.push(_node3);
-      if (!result.autoclose) this.openElements.push(_node3);
+      let collection = result.element.attributes.find(x => x.name == 'collection').expression;
+      let item = result.element.attributes.find(x => x.name == 'item')?.expression.name;
+      let key = result.element.attributes.find(x => x.name == 'key')?.expression.name;
+      let node = new TForeach(collection, item, key);
+      element.children.push(node);
+      if (!result.autoclose) this.openElements.push(node);
     }
   }
   closeSpecialElement(tagName) {
     tagName = tagName.toLowerCase();
-    var last = this.openElements[this.openElements.length - 1];
+    const last = this.openElements[this.openElements.length - 1];
     if (tagName == ':if') {
-      if (last instanceof _TIf.TIf && last.conditions.length == 1 && last.else == null) {
+      if (last instanceof TIf && last.conditions.length == 1 && last.else == null) {
         this.openElements.pop();
       } else {
         this.throw("Last opened element is not <:if>");
       }
     } else if (tagName == ':else-if') {
-      if (last instanceof _TIf.TIf && last.conditions.length > 1 && last.else == null) {
+      if (last instanceof TIf && last.conditions.length > 1 && last.else == null) {
         this.openElements.pop();
       } else {
         this.throw("Last opened element is not <:else-if>");
       }
     } else if (tagName == ':else') {
-      if (last instanceof _TIf.TIf && last.else != null) {
+      if (last instanceof TIf && last.else != null) {
         this.openElements.pop();
       } else {
         this.throw("Last opened element is not <:else>");
       }
     } else if (tagName == ':loop') {
-      if (last instanceof _TLoop.TLoop) {
+      if (last instanceof TLoop) {
         this.openElements.pop();
       } else {
         this.throw("Last opened element is not <:loop>");
       }
     } else if (tagName == ':foreach') {
-      if (last instanceof _TForeach.TForeach) {
+      if (last instanceof TForeach) {
         this.openElements.pop();
       } else {
         this.throw("Last opened element is not <:foreach>");
@@ -254,4 +243,3 @@ class AbstractMLParser extends _AbstractParser.AbstractParser {
     }
   }
 }
-exports.AbstractMLParser = AbstractMLParser;

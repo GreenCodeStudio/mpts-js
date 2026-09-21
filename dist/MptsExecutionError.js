@@ -1,15 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.MptsExecutionError = void 0;
-class MptsExecutionError extends Error {
+export class MptsExecutionError extends Error {
   constructor(message, codePosition, previous) {
-    super("".concat(message, "\r\n").concat(codePosition));
+    super(`${message}\r\n${codePosition}`);
     this.codePosition = codePosition;
     this.messageRaw = message;
     this.previous = previous;
   }
 }
-exports.MptsExecutionError = MptsExecutionError;
