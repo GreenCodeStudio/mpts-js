@@ -10,6 +10,8 @@ import {ExpressionParser} from "../../src/parser/ExpressionParser.js";
 import {TEVariable} from "../../src/nodes/expressions/TEVariable.js";
 import {TEBoolean} from "../../src/nodes/expressions/TEBoolean.js";
 import {TEConcatenate} from "../../src/nodes/expressions/TEConcatenate.js";
+import {TEAnd} from "../../src/nodes/expressions/TEAnd.js";
+import {TEOr} from "../../src/nodes/expressions/TEOr.js";
 
 
 describe('ExpressionTest', () => {
@@ -151,8 +153,42 @@ describe('ExpressionTest', () => {
             expect(obj.right).to.be.instanceOf(TEString)
             expect(obj.right.value).to.be.equal("empty")
         });
+        it('orNullSpaces', async () => {
+            const obj = ExpressionParser.Parse('var1 ?? "empty"');
+            expect(obj).to.be.instanceOf(TEOrNull)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
+        });
+        it('orEmpty', async () => {
+            const obj = ExpressionParser.Parse('var1???"empty"');
+            expect(obj.constructor.name).to.be.equal("TEOrEmpty")
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
+        });
+        it('orEmptySpaces', async () => {
+            const obj = ExpressionParser.Parse('var1 ??? "empty"');
+            expect(obj.constructor.name).to.be.equal("TEOrEmpty")
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
+        });
         it('orNullProperty', async () => {
             const obj = ExpressionParser.Parse('var1.property??"empty"');
+            expect(obj).to.be.instanceOf(TEOrNull)
+            expect(obj.left).to.be.instanceOf(TEProperty)
+            expect(obj.left.name).to.be.equal("property")
+            expect(obj.left.source).to.be.instanceOf(TEVariable)
+            expect(obj.left.source.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEString)
+            expect(obj.right.value).to.be.equal("empty")
+        });
+        it('orNullPropertySpaces', async () => {
+            const obj = ExpressionParser.Parse('var1.property ?? "empty"');
             expect(obj).to.be.instanceOf(TEOrNull)
             expect(obj.left).to.be.instanceOf(TEProperty)
             expect(obj.left.name).to.be.equal("property")
@@ -184,6 +220,20 @@ describe('ExpressionTest', () => {
             expect(obj.args[2]).to.be.instanceOf(TEVariable)
             expect(obj.args[2].name).to.be.equal("data")
         });
+        it('functionCall3', async () => {
+            const obj = ExpressionParser.Parse("getView(object.prop1, object.prop2, 'text')");
+            expect(obj).to.be.instanceOf(TEMethodCall)
+            expect(obj.source).to.be.instanceOf(TEVariable)
+            expect(obj.source.name).to.be.equal("getView")
+            expect(obj.args[0]).to.be.instanceOf(TEProperty)
+            expect(obj.args[0].name).to.be.equal("prop1")
+            expect(obj.args[0].source.name).to.be.equal("object")
+            expect(obj.args[1]).to.be.instanceOf(TEProperty)
+            expect(obj.args[1].name).to.be.equal("prop2")
+            expect(obj.args[1].source.name).to.be.equal("object")
+            expect(obj.args[2]).to.be.instanceOf(TEString)
+            expect(obj.args[2].value).to.be.equal("text")
+        });
 
         it('add', async () => {
             const obj = ExpressionParser.Parse('a+b');
@@ -192,6 +242,49 @@ describe('ExpressionTest', () => {
             expect(obj.left.name).to.be.equal("a")
             expect(obj.right).to.be.instanceOf(TEVariable)
             expect(obj.right.name).to.be.equal("b")
+        });
+        it('notEqualsNull', async () => {
+            const obj = ExpressionParser.Parse('var1 != null');
+            expect(obj.constructor.name).to.be.equal("TENotEqual")
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right.constructor.name).to.be.equal("TENull")
+        });
+        it('null', async () => {
+            const obj = ExpressionParser.Parse('null');
+            expect(obj.constructor.name).to.be.equal("TENull")
+        });
+        it('or', async () => {
+            const obj = ExpressionParser.Parse('var1 || var2');
+            expect(obj).to.be.instanceOf(TEOr)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
+        });
+        it('orNoSpaces', async () => {
+            const obj = ExpressionParser.Parse('var1||var2');
+            expect(obj).to.be.instanceOf(TEOr)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
+        });
+        it('and', async () => {
+            const obj = ExpressionParser.Parse('var1 && var2');
+            expect(obj).to.be.instanceOf(TEAnd)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
+        });
+        it('andNoSpaces', async () => {
+            const obj = ExpressionParser.Parse('var1&&var2');
+            expect(obj).to.be.instanceOf(TEAnd)
+            expect(obj.left).to.be.instanceOf(TEVariable)
+            expect(obj.left.name).to.be.equal("var1")
+            expect(obj.right).to.be.instanceOf(TEVariable)
+            expect(obj.right.name).to.be.equal("var2")
         });
     });
 });
