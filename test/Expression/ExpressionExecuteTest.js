@@ -114,7 +114,7 @@ describe('ExpressionTest', () => {
             expect(obj.execute(env)).to.be.equal(10)
         });
 
-        it('method call mutliple', async () => {
+        it('method call multiple', async () => {
             const obj = parse('fun(first,second)');
 
             const env = new Environment();
@@ -168,12 +168,34 @@ describe('ExpressionTest', () => {
         });
 
         it('orNull', async () => {
-            const obj = parse('var1??"empty"');
+            const obj = parse('var1??"placeholder"');
 
             const env = new Environment();
-            expect(obj.execute(env)).to.be.equal("empty")
+            expect(obj.execute(env)).to.be.equal("placeholder")
             env.variables.var1 = null;
-            expect(obj.execute(env)).to.be.equal("empty")
+            expect(obj.execute(env)).to.be.equal("placeholder")
+            env.variables.var1 = '';
+            expect(obj.execute(env)).to.be.equal("")
+            env.variables.var1 = 0;
+            expect(obj.execute(env)).to.be.equal(0)
+            env.variables.var1 = false;
+            expect(obj.execute(env)).to.be.equal(false)
+            env.variables.var1 = "val";
+            expect(obj.execute(env)).to.be.equal("val")
+        });
+        it('orEmpty', async () => {
+            const obj = parse('var1???"placeholder"');
+
+            const env = new Environment();
+            expect(obj.execute(env)).to.be.equal("placeholder")
+            env.variables.var1 = null;
+            expect(obj.execute(env)).to.be.equal("placeholder")
+            env.variables.var1 = '';
+            expect(obj.execute(env)).to.be.equal("placeholder")
+            env.variables.var1 = 0;
+            expect(obj.execute(env)).to.be.equal("placeholder")
+            env.variables.var1 = false;
+            expect(obj.execute(env)).to.be.equal("placeholder")
             env.variables.var1 = "val";
             expect(obj.execute(env)).to.be.equal("val")
         });
@@ -275,7 +297,7 @@ describe('ExpressionTest', () => {
             const result = obj.execute(env);
             expect(result).to.be.equal(null);
         });
-        it('test not existing property nullable operator', async () => {
+        it('not existing property nullable operator', async () => {
             const obj = parse("a?.b.c");
             const env = new Environment();
             env.allowUndefined = false;
