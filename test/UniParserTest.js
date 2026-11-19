@@ -13,6 +13,9 @@ import {TEBoolean} from "../src/nodes/expressions/TEBoolean.js";
 import {TLoop} from "../src/nodes/TLoop.js";
 import {TENumber} from "../src/nodes/expressions/TENumber.js";
 import {TForeach} from "../src/nodes/TForeach.js";
+import {TEComparsion} from "../src/nodes/expressions/TEComparsion.js";
+import {TEEqual} from "../src/nodes/expressions/TEEqual.js";
+import {TEProperty} from "../src/nodes/expressions/TEProperty.js";
 
 export function UniParserTest(parser){
     it('basic text', async () => {
@@ -155,6 +158,24 @@ export function UniParserTest(parser){
         expect(obj.children[0].conditions[1].children[0]).to.be.instanceOf(TText);
         expect(obj.children[0].else.children[0]).to.be.instanceOf(TText);
     });
+    it('if no space', async () => {
+        const obj = parser.Parse("<:if condition=a.b<c>text</:if>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEComparsion);
+        expect(obj.children[0].conditions[0].expression.left).to.be.instanceOf(TEProperty);
+        expect(obj.children[0].conditions[0].expression.right).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
+    });
+    it('if short', async () => {
+        const obj = parser.Parse("<:if var1==123>text</:if>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TIf);
+        expect(obj.children[0].conditions[0].expression).to.be.instanceOf(TEEqual);
+        expect(obj.children[0].conditions[0].expression.left).to.be.instanceOf(TEVariable);
+        expect(obj.children[0].conditions[0].expression.right).to.be.instanceOf(TENumber);
+        expect(obj.children[0].conditions[0].children[0]).to.be.instanceOf(TText);
+    });
     it('loop', async () => {
         const obj = parser.Parse("<:loop count=10>b</:loop>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
@@ -242,6 +263,34 @@ export function UniParserTest(parser){
         expect(attr.expression).to.be.instanceOf(TEString);
         expect(attr.expression.value).to.be.equal("value");
     });
+    it('attribute with method call', async () => {
+        const obj = parser.Parse("<div attr=variable.method(1,2) attr2=variable.method2(3,4)></div>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        const attr = obj.children[0].attributes[0];
+        expect(attr).to.be.instanceOf(TAttribute);
+        expect(attr.name).to.be.equals("attr");
+        expect(attr.expression).to.be.instanceOf(TEMethodCall);
+        expect(attr.expression.source).to.be.instanceOf(TEProperty);
+        expect(attr.expression.source.name).to.be.equal("method");
+        expect(attr.expression.source.source).to.be.instanceOf(TEVariable);
+        expect(attr.expression.source.source.name).to.be.equal("variable");
+        expect(attr.expression.args.length).to.be.equal(2);
+        expect(attr.expression.args[0].value).to.be.equal(1);
+        expect(attr.expression.args[1].value).to.be.equal(2);
+
+        const attr2 = obj.children[0].attributes[1];
+        expect(attr2).to.be.instanceOf(TAttribute);
+        expect(attr2.name).to.be.equals("attr2");
+        expect(attr2.expression).to.be.instanceOf(TEMethodCall);
+        expect(attr2.expression.source).to.be.instanceOf(TEProperty);
+        expect(attr2.expression.source.name).to.be.equal("method2");
+        expect(attr2.expression.source.source).to.be.instanceOf(TEVariable);
+        expect(attr2.expression.source.source.name).to.be.equal("variable");
+        expect(attr2.expression.args.length).to.be.equal(2);
+        expect(attr2.expression.args[0].value).to.be.equal(3);
+        expect(attr2.expression.args[1].value).to.be.equal(4);
+    });
 
     it('DTD html5', async () => {
         const obj = parser.Parse("<!DOCTYPE html>");
@@ -255,6 +304,15 @@ export function UniParserTest(parser){
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TDocumentType)
         expect(obj.children[0].text).to.be.equal('PUBLIC SYSTEM "file.dtd"');
-    })
+    });
+
+    it('quick closing', async () => {
+        const obj = parser.Parse("<span/><span/>");
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equal("span");
+        expect(obj.children[1]).to.be.instanceOf(TElement);
+        expect(obj.children[1].tagName).to.be.equal("span");
+    });
 
 }
