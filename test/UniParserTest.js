@@ -61,7 +61,7 @@ export function UniParserTest(parser){
         expect(obj.children[0].children[0].children[1]).to.be.instanceOf(TElement);
         expect(obj.children[0].children[0].children[1].tagName).to.be.equals("span");
     });
-    it('element with attributes', async () => {
+    it('element with attribute', async () => {
         const obj = parser.Parse("<img src=\"a.png\" alt='a'/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -76,7 +76,7 @@ export function UniParserTest(parser){
         expect(obj.children[0].attributes[1].expression.value).to.be.equal("a");
     });
 
-    it('element with attributes with variables', async () => {
+    it('element with attribute with variables', async () => {
         const obj = parser.Parse("<img src=(v1) alt=v2 class=(getClass())/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -101,7 +101,7 @@ export function UniParserTest(parser){
       expect(()=>parser.Parse("<img src=.value/>", "file.mpts")).to.throw(/file\.mpts:1:9/);
     })
 
-    it('element with boolean atributes', async () => {
+    it('element with boolean atribute', async () => {
         const obj = parser.Parse("<textarea required/>");
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -230,7 +230,7 @@ export function UniParserTest(parser){
         expect(obj.children[0].children[0].count.value).to.be.equal(3);
     });
 
-    it('nested conditions', async () => {
+    it('nexted conditions', async () => {
         const obj = parser.Parse('<:if condition=true><:if condition=false>test</:if></:if>');
         expect(obj).to.be.instanceOf(TDocumentFragment);
         expect(obj.children[0]).to.be.instanceOf(TIf);

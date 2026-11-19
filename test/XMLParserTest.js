@@ -28,7 +28,7 @@ describe('XMLParser', () => {
     });
 
     describe('cases from real life', () => {
-        it('1', async () => {
+        it('real life1', async () => {
             const obj = XMLParser.Parse("<input name=\"realizationTime\" type=\"number\" step=\"0.01\" value=(data.realizationTime??t('roomsList.sumPrice.realizationTime.value')) />");
             expect(obj).to.be.instanceOf(TDocumentFragment);
             expect(obj.children[0]).to.be.instanceOf(TElement);

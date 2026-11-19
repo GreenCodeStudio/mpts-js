@@ -53,8 +53,19 @@ describe('HTMLParser', () => {
             });
         }
     });
+    it('auto closing tags', async () => {
+        const tags = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+        for (const tag of tags) {
+            const obj = HTMLParser.Parse("<" + tag + ">after");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equal(tag);
+            expect(obj.children[1]).to.be.instanceOf(TText);
+            expect(obj.children[1].text).to.be.equal('after');
+        }
+    });
     describe('ommiting tags', () => {
-        it('typeDeep', async () => {
+        it('ommit tag type deep', async () => {
             const obj = HTMLParser.Parse("<div><div><div>");
             expect(obj).to.be.instanceOf(TDocumentFragment);
             expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -65,7 +76,7 @@ describe('HTMLParser', () => {
             expect(obj.children[0].children[0].children[0].tagName).to.be.equals("div");
         });
 
-        it('typeNotDeep', async () => {
+        it('ommit tag type not deep', async () => {
             const obj = HTMLParser.Parse("<p><p><p>");
             expect(obj).to.be.instanceOf(TDocumentFragment);
             expect(obj.children[0]).to.be.instanceOf(TElement);
@@ -102,6 +113,19 @@ describe('HTMLParser', () => {
                 });
             }
         })
+        it('p closed by next element', async () => {
+            const options = ['address', 'article', 'aside', 'blockquote', 'dir', 'div', 'dl', 'fieldset', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'menu', 'nav', 'ol', 'p', 'pre', 'section', 'table', 'ul'];
+            for (const option of options) {
+                const obj = HTMLParser.Parse("<p>content<" + option + " />after");
+                expect(obj).to.be.instanceOf(TDocumentFragment);
+                expect(obj.children[0]).to.be.instanceOf(TElement);
+                expect(obj.children[0].tagName).to.be.equals("p");
+                expect(obj.children[1]).to.be.instanceOf(TElement);
+                expect(obj.children[1].tagName).to.be.equals(option);
+                expect(obj.children[2]).to.be.instanceOf(TText);
+                expect(obj.children[2].text).to.be.equals('after');
+            }
+        });
         describe('autoclose by next occurence', async () => {
             const options = ['p','optgroup', 'option']
             for (const option of options) {
@@ -116,7 +140,18 @@ describe('HTMLParser', () => {
                     expect(obj.children[1].tagName).to.be.equals(option);
                 });
             }
-        })        ;
+        });
+        it('autoclose by next occurence', async () => {
+            const options = ['p', 'optgroup', 'option'];
+            for (const option of options) {
+                const obj = HTMLParser.Parse("<" + option + "><" + option + ">");
+                expect(obj).to.be.instanceOf(TDocumentFragment);
+                expect(obj.children[0]).to.be.instanceOf(TElement);
+                expect(obj.children[0].tagName).to.be.equals(option);
+                expect(obj.children[1]).to.be.instanceOf(TElement);
+                expect(obj.children[1].tagName).to.be.equals(option);
+            }
+        });
 
 
         it('optgroup', async () => {
@@ -157,7 +192,17 @@ describe('HTMLParser', () => {
             expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
             expect(obj.children[0].children[1].tagName).to.be.equals("section");
         });
-        it('ul li', async () => {
+        it('ommit tag type mix', async () => {
+            const obj = HTMLParser.Parse("<div><br><section>");
+            expect(obj).to.be.instanceOf(TDocumentFragment);
+            expect(obj.children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].tagName).to.be.equals("div");
+            expect(obj.children[0].children[0]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[0].tagName).to.be.equals("br");
+            expect(obj.children[0].children[1]).to.be.instanceOf(TElement);
+            expect(obj.children[0].children[1].tagName).to.be.equals("section");
+        });
+        it('ommit tag type list', async () => {
             const obj = HTMLParser.Parse("<ul><li>one<li>two<li>three</ul>");
 
             expect(obj).to.be.instanceOf(TDocumentFragment);
