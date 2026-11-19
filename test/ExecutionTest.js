@@ -182,7 +182,6 @@ describe('Execution', () => {
         const obj = XMLParser.Parse("{{notExisting}}");
         const env = new Environment();
         env.document = document;
-        const result = obj.execute(env);
         expect(() => obj.execute(env)).to.throw(Error);
         expect(() => obj.execute(env)).to.throw(/undefined variable: notExisting/);
         expect(() => obj.execute(env)).to.throw(/file\.mpts:1:2/);
@@ -204,13 +203,29 @@ describe('Execution', () => {
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("default");
     });
-    it('not existing property with ?.', async () => {
+    it('not existing property nullable operator', async () => {
         const obj = XMLParser.Parse("{{a?.b}}");
         const env = new Environment();
         env.document = document;
         env.variables.a = {};
         const result = obj.execute(env);
         expect(result.textContent).to.be.equal("");
+    });
+    it('entities', async () => {
+        const obj = XMLParser.Parse("<div class=\"&quot;&amp;&lt;&gt;&apos;\">&#x61;&#98;</div>");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(result.firstChild.getAttribute("class")).to.be.equal("\"&<>'");
+        expect(result.textContent).to.be.equal("ab");
+    });
+    it('xml declaration', async () => {
+        const obj = XMLParser.Parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><root/>");
+        const env = new Environment();
+        env.document = document;
+        const result = obj.execute(env);
+        expect(result.childNodes[0].tagName.toLowerCase()).to.be.equal("root");
+        expect(result.childNodes[0].childNodes.length).to.be.equal(0);
     });
     it('exception inside expression', async () => {
         const obj = XMLParser.Parse("{{a.b()}}");
