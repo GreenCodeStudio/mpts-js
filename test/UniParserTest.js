@@ -17,6 +17,7 @@ import {TEComparsion} from "../src/nodes/expressions/TEComparsion.js";
 import {TEConcatenate} from "../src/nodes/expressions/TEConcatenate.js";
 import {TEEqual} from "../src/nodes/expressions/TEEqual.js";
 import {TEProperty} from "../src/nodes/expressions/TEProperty.js";
+import {TEOrNull} from "../src/nodes/expressions/TEOrNull.js";
 
 export function UniParserTest(parser){
     it('basic text', async () => {
@@ -316,7 +317,7 @@ export function UniParserTest(parser){
         expect(obj.children[1].tagName).to.be.equal("span");
     });
 
-    it('real life1', async () => {
+    it('real life2', async () => {
         const obj = parser.Parse(`<input type="text" value=(article.documentNumber??"")
                name=("articles[":article.article_id:"][":article.innerNeed_id:"][documentNumber]") />`);
         expect(obj).to.be.instanceOf(TDocumentFragment);
@@ -327,7 +328,7 @@ export function UniParserTest(parser){
         expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
 
         expect(obj.children[0].attributes[1].name).to.be.equals("value");
-        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEConcatenate);
+        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEOrNull);
 
         expect(obj.children[0].attributes[2].name).to.be.equals("name");
         expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEConcatenate);
