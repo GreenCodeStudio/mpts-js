@@ -12,11 +12,12 @@ import { TForeach } from "../nodes/TForeach.js";
 import { TExpressionSubnode } from "../nodes/TExpressionSubnode.js";
 import { TDocumentType } from "../nodes/TDocumentType.js";
 export class AbstractMLParser extends AbstractParser {
-  constructor(text) {
+  constructor(text, fileName = null) {
     super();
     this.text = text;
     this.position = 0;
     this.openElements = [new TDocumentFragment()];
+    this.fileName = fileName;
   }
   parseNormal() {
     while (this.position < this.text.length) {
@@ -52,9 +53,12 @@ export class AbstractMLParser extends AbstractParser {
             const closing = this.openElements.find(e => e instanceof TElement && e.tagName == name);
             this.openElements.splice(0, this.openElements.indexOf(closing) + 1);
             this.openElements.reverse();
-          } else {
+          } else if (element instanceof TElement) {
             this.position = positionCopy;
             this.throw(`Last opened element is not <${name}> ${element.tagName ? `but <${element.tagName}>` : ''}`);
+          } else {
+            this.position = positionCopy;
+            this.throw(`There is no opened element, <${name}> closed`);
           }
         } else {
           this.position++;

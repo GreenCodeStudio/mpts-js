@@ -6,8 +6,8 @@ export class HTMLParser extends AbstractMLParser {
     onlySiblingsElements = ['li', 'dt', 'dd', 'p', 'rt', 'rp', 'optgroup', 'option', 'colgroup', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th'];
     allowAutoClose = true;
 
-    static Parse(text) {
-        return (new HTMLParser(text)).parseNormal();
+    static Parse(text, fileName = null) {
+        return (new HTMLParser(text, fileName)).parseNormal();
     }
 
     addElement(element, autoclose = false) {

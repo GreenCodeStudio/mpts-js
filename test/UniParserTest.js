@@ -99,7 +99,7 @@ export function UniParserTest(parser){
     });
     it('element with syntax error in attribute', async () => {
       expect(()=>parser.Parse("<img src=.value/>")).to.throw(MptsParserError);
-      expect(()=>parser.Parse("<img src=.value/>")).to.throw(/source object expected before dot/);
+      expect(()=>parser.Parse("<img src=.value/>")).to.throw(/unexpected '\.'/);
       expect(()=>parser.Parse("<img src=.value/>", "file.mpts")).to.throw(/file\.mpts:1:9/);
     })
 

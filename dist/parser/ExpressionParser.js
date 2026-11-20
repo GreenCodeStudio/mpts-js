@@ -181,8 +181,11 @@ export class ExpressionParser extends AbstractParser {
         let right = this.parseNormal(30);
         lastNode = new TENegate(right);
       } else if (char == ":") {
+        if (endLevel >= 50) {
+          break;
+        }
         this.position++;
-        let right = this.parseNormal(3);
+        let right = this.parseNormal(50);
         lastNode = new TEConcatenate(lastNode, right);
       } else if (char == ">") {
         if (endLevel == 0 || endLevel == 1) {
