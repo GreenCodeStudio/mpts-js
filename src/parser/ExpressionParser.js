@@ -171,7 +171,7 @@ export class ExpressionParser extends AbstractParser {
                 this.position++;
                 let right = this.parseNormal(70);
                 lastNode = new TEMultiply(lastNode, right);
-            } else if (char == "/") {
+            } else if (char == "/" && this.text[this.position + 1] != '>') {
                 if (endLevel >= 70) {
                     break;
                 }

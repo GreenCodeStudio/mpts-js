@@ -10,6 +10,7 @@ import {TLoop} from "../nodes/TLoop.js";
 import {TComment} from "../nodes/TComment.js";
 import {TForeach} from "../nodes/TForeach.js";
 import {TExpressionSubnode} from "../nodes/TExpressionSubnode.js";
+import {TDocumentType} from "../nodes/TDocumentType.js";
 
 export class AbstractMLParser extends AbstractParser {
     constructor(text) {
@@ -57,12 +58,14 @@ export class AbstractMLParser extends AbstractParser {
                         this.openElements.reverse();
                     } else {
                         this.position = positionCopy;
-                        this.throw(`Last opened element is not <${name}> ${element.tagName?`but <${element.tagName}>`:''}`);
+                        this.throw(`Last opened element is not <${name}> ${element.tagName ? `but <${element.tagName}>` : ''}`);
                     }
                 } else {
                     this.position++;
                     let result = this.parseElement();
-                    if (result.element.tagName.startsWith(':')) {
+                    if (result.element instanceof TDocumentType) {
+                        this.addElement(result.element, result.autoclose)
+                    } else if (result.element.tagName.startsWith(':')) {
                         this.convertToSpecialElement(result, element);
 
                     } else {
@@ -92,42 +95,72 @@ export class AbstractMLParser extends AbstractParser {
     }
 
     parseElement() {
-        let autoclose = false;
-        let element = new TElement();
-        element.parsePosition = this.position;
-        while (this.position < this.text.length) {
-            const char = this.text[this.position];
-            if (char == '>' || char == ' ' || char == '/')
-                break;
-            element.tagName += char;
+        let autoclose;
+        let element;
+        if (this.text.substr(this.position, 9).toLowerCase() == '!doctype ') {
+            autoclose = true;
+            element = new TDocumentType();
+            this.position += 9;
+            element.content = this.readUntilText("/>");
             this.position++;
-        }
+        } else {
+            autoclose = false;
+            element = new TElement();
+            element.parsePosition = this.position;
+            while (this.position < this.text.length) {
+                const char = this.text[this.position];
+                if (char == '>' || char == ' ' || char == '/')
+                    break;
+                element.tagName += char;
+                this.position++;
+            }
 
-        while (this.position < this.text.length) {
-            let char = this.text[this.position];
-            if (char == '>') {
-                this.position++;
-                break;
-            } else if (char == '/') {
-                this.position++;
-                autoclose = true;
-            } else if (/\s/.test(char)) {
-                this.position++;
-            } else {
-                let name = this.readUntil(/[\s=/]/);
-                let value = null;
-                this.skipWhitespace()
-                char = this.text[this.position];
-                if (char == '=') {
-                    this.position++
+            while (this.position < this.text.length) {
+                let char = this.text[this.position];
+                if (char == '>') {
+                    this.position++;
+                    break;
+                } else if (char == '/') {
+                    this.position++;
+                    autoclose = true;
+                } else if (/\s/.test(char)) {
+                    this.position++;
+                } else if (element.tagName == ':if' && this.text.substr(this.position, 9).toLowerCase() != 'condition') {
+                    let value;
+                    if (char == '(') {
+                        this.position++;
+                        const parser = new ExpressionParser(this.text.substring(this.position), this.fileName, this.currentFilePosition, this.currentLineOffset, this.currentColumnOffset);
+                        value = parser.parseNormal(10)
+                        this.position += parser.position;
+                    } else {
+                        const parser = new ExpressionParser(this.text.substring(this.position), this.fileName, this.currentFilePosition, this.currentLineOffset, this.currentColumnOffset);
+                        value = parser.parseNormal(1)
+                        this.position += parser.position;
+                    }
+                    element.attributes.push(new TAttribute('condition', value))
+                } else {
+                    let name = this.readUntil(/[\s=/]/);
+                    let value = null;
                     this.skipWhitespace()
+                    char = this.text[this.position];
+                    if (char == '=') {
+                        this.position++
+                        this.skipWhitespace()
 
-                    const char2 = this.text[this.position];
-                    const parser = new ExpressionParser(this.text.substring(this.position));
-                    value = parser.parseNormal()
-                    this.position += parser.position;
+                        const char2 = this.text[this.position];
+                        if (char2 == '(') {
+                            this.position++;
+                            const parser = new ExpressionParser(this.text.substring(this.position), this.fileName, this.currentFilePosition, this.currentLineOffset, this.currentColumnOffset);
+                            value = parser.parseNormal(10)
+                            this.position += parser.position;
+                        } else {
+                            const parser = new ExpressionParser(this.text.substring(this.position), this.fileName, this.currentFilePosition, this.currentLineOffset, this.currentColumnOffset);
+                            value = parser.parseNormal(1)
+                            this.position += parser.position;
+                        }
+                    }
+                    element.attributes.push(new TAttribute(name, value))
                 }
-                element.attributes.push(new TAttribute(name, value))
             }
         }
         return {element, autoclose};
