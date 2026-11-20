@@ -14,6 +14,7 @@ import {TLoop} from "../src/nodes/TLoop.js";
 import {TENumber} from "../src/nodes/expressions/TENumber.js";
 import {TForeach} from "../src/nodes/TForeach.js";
 import {TEComparsion} from "../src/nodes/expressions/TEComparsion.js";
+import {TEConcatenate} from "../src/nodes/expressions/TEConcatenate.js";
 import {TEEqual} from "../src/nodes/expressions/TEEqual.js";
 import {TEProperty} from "../src/nodes/expressions/TEProperty.js";
 
@@ -313,6 +314,23 @@ export function UniParserTest(parser){
         expect(obj.children[0].tagName).to.be.equal("span");
         expect(obj.children[1]).to.be.instanceOf(TElement);
         expect(obj.children[1].tagName).to.be.equal("span");
+    });
+
+    it('real life1', async () => {
+        const obj = parser.Parse(`<input type="text" value=(article.documentNumber??"")
+               name=("articles[":article.article_id:"][":article.innerNeed_id:"][documentNumber]") />`);
+        expect(obj).to.be.instanceOf(TDocumentFragment);
+        expect(obj.children[0]).to.be.instanceOf(TElement);
+        expect(obj.children[0].tagName).to.be.equal("input");
+        expect(obj.children[0].attributes[0]).to.be.instanceOf(TAttribute);
+        expect(obj.children[0].attributes[0].name).to.be.equals("type");
+        expect(obj.children[0].attributes[0].expression).to.be.instanceOf(TEString);
+
+        expect(obj.children[0].attributes[1].name).to.be.equals("value");
+        expect(obj.children[0].attributes[1].expression).to.be.instanceOf(TEConcatenate);
+
+        expect(obj.children[0].attributes[2].name).to.be.equals("name");
+        expect(obj.children[0].attributes[2].expression).to.be.instanceOf(TEConcatenate);
     });
 
 }
